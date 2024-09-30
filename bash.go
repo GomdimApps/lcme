@@ -17,11 +17,11 @@ func Bash(command string) (string, error) {
 
 	err := cmd.Run()
 	if err != nil {
-		return out.String(), fmt.Errorf("error executing command: %s\n%s", err, stderr.String())
+		return out.String(), fmt.Errorf("error executing command: %s\nstderr: %s", err.Error(), stderr.String())
 	}
 
 	if cmd.ProcessState.ExitCode() != 0 {
-		return out.String(), fmt.Errorf("command exited with non-zero status: %d", cmd.ProcessState.ExitCode())
+		return out.String(), fmt.Errorf("command exited with non-zero status: %d\nstderr: %s", cmd.ProcessState.ExitCode(), stderr.String())
 	}
 
 	return out.String(), nil

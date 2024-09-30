@@ -6,7 +6,49 @@
 go get github.com/GomdimApps/lcme
 ```
 
-## ConfigRead
+# Bash
+
+Executa um comando Bash e retorna a saída padrão e um erro, se houver.
+
+#### Parâmetros
+
+- **`command`** (string): Comando Bash a ser executado.
+
+#### Retornos
+
+- **`string`**: Saída padrão do comando.
+- **`error`**: Descrição do erro, se ocorrer.
+
+#### Exemplo de Uso
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/GomdimApps/lcme"
+)
+
+func main() {
+    comando := "rm -r teste.txt" // Comando a ser executado
+
+    resultado, erro := lcme.Bash(comando)
+    if erro != nil {
+        fmt.Println("Erro:", erro) // Exibe erro, se houver
+    } else {
+        fmt.Println("Resultado:", resultado) // Exibe a saída do comando
+    }
+}
+```
+
+### Comportamento
+
+- Retorna a saída do comando e `nil` se bem-sucedido.
+- Retorna a saída e um erro descritivo se o comando falhar.
+
+---
+
+# ConfigRead
 
 A função `ConfigRead` serve para carregar um arquivo de configuração (`config.conf`) e preencher a estrutura `Config` com os valores lidos. O arquivo de configuração deve seguir o formato `chave=valor`.
 

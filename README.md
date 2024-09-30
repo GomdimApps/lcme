@@ -149,3 +149,34 @@ func main() {
     fmt.Printf("ResponseTime: %.2f\n", config.ResponseTime)
 }
 ```
+
+# getInfoServer
+
+---
+
+```go
+package main
+
+import (
+    "fmt"
+    "github.com/GomdimApps/lcme" 
+)
+
+func main() {
+    serverInfo := getInfoServer()
+    if serverInfo.Error != nil {
+        fmt.Printf("Erro ao obter informações do servidor: %v\n", serverInfo.Error)
+        return
+    }
+
+    fmt.Printf("Memória total: %v MB\n", serverInfo.TotalMemory)
+    fmt.Printf("Memória usada: %v MB\n", serverInfo.UsedMemory)
+    fmt.Printf("Memória livre: %v MB\n", serverInfo.FreeMemory)
+    fmt.Printf("Uso da CPU: %f%%\n", serverInfo.CPUUsage)
+    fmt.Printf("Espaço total em disco: %v MB\n", serverInfo.TotalDiskSpace)
+    fmt.Printf("Espaço utilizado em disco: %v MB\n", serverInfo.UsedDiskSpace)
+    fmt.Printf("Espaço livre em disco: %v MB\n", serverInfo.FreeDiskSpace)
+}
+```
+
+

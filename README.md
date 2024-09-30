@@ -1,5 +1,11 @@
 # LCME (Linux Command and Microservices Executor)
 
+## Como adicionar o Framework
+
+```bash
+go get github.com/GomdimApps/lcme
+```
+
 ## ConfigRead
 
 A função `ConfigRead` serve para carregar um arquivo de configuração (`config.conf`) e preencher a estrutura `Config` com os valores lidos. O arquivo de configuração deve seguir o formato `chave=valor`.

@@ -1,4 +1,26 @@
-# LCME (Linux Command and Microservices Executor)
+# LCME (Linux Content Management Engine)
+
+### **Propósito do Framework LCME**
+
+O LCME é um framework projetado para facilitar a criação e gestão de conteúdo em aplicações web e aplicações de microserviços no Linux. Ele é leve e modular, permitindo que desenvolvedores integrem funcionalidades de gerenciamento de conteúdo de forma eficiente e escalável.
+
+### **Objetivo do Framework**
+
+O principal objetivo do LCME é fornecer uma solução simples e eficaz para o gerenciamento de conteúdo, com um foco especial em aplicações de microserviços desenvolvidas em Go. O projeto visa utilizar o mínimo de frameworks de terceiros, tornando a aplicação altamente nativa e reduzindo dependências externas.
+
+### **Como o LCME Pode Ajudar em Projetos Go**
+
+1. **Modularidade**: O framework é modular, o que significa que você pode escolher e integrar apenas os componentes que são necessários para o seu projeto, mantendo o sistema leve e eficiente.
+
+2. **Escalabilidade**: Com uma arquitetura leve, o LCME permite que aplicações escalem de forma eficiente, suportando um aumento no volume de conteúdo sem comprometer o desempenho.
+
+3. **Customização**: O LCME oferece uma alta capacidade de customização, permitindo que desenvolvedores adaptem o framework às necessidades específicas do projeto, seja na interface de usuário ou na lógica de backend.
+
+4. **Natividade**: Ao minimizar o uso de frameworks de terceiros, o LCME garante que a aplicação permaneça altamente nativa, o que pode resultar em melhor desempenho e menor complexidade.
+
+5. **Interação Nativa com Linux**: O LCME facilita o uso e a implementação de microserviços, trazendo maneiras nativas de interagir com o sistema operacional Linux (Server) dentro de uma aplicação, o que pode ser extremamente útil para operações de baixo nível e otimizações específicas do sistema.
+
+6. **Documentação e Suporte**: O repositório inclui documentação detalhada e exemplos de uso, facilitando a curva de aprendizado e a implementação do framework em novos projetos.
 
 ## Como adicionar o Framework
 
@@ -154,9 +176,6 @@ func main() {
 
 A função `getInfoServer` é responsável por capturar diversas informações do sistema, como dados de distribuição Linux, memória, disco, CPU, e rede.
 
----
-
-#### Passo 2: Importe o pacote no seu código
 
 No seu código Go, importe o pacote `lcme` e chame a função `getInfoServer` para capturar as informações do servidor.
 
@@ -172,10 +191,10 @@ func main() {
 	// Captura informações do servidor
 	serverInfo := lcme.GetInfoServer()
 
-	// Exibe os dados capturados (Exemplo para imprimir no console)
+	// Exibe os dados capturados
 	fmt.Printf("Distribuição Linux: %s\n", serverInfo.Distribution.Name)
 	fmt.Printf("Memória total: %d MB\n", serverInfo.RAM.Total)
-	// Continue para outras informações...
+	
 }
 ```
 

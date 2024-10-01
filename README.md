@@ -152,31 +152,100 @@ func main() {
 
 # getInfoServer
 
+A função `getInfoServer` é responsável por capturar diversas informações do sistema, como dados de distribuição Linux, memória, disco, CPU, e rede.
+
 ---
+
+#### Passo 2: Importe o pacote no seu código
+
+No seu código Go, importe o pacote `lcme` e chame a função `getInfoServer` para capturar as informações do servidor.
 
 ```go
 package main
 
 import (
-    "fmt"
-    "github.com/GomdimApps/lcme" 
+	"fmt"
+	"github.com/GomdimApps/lcme"
 )
 
 func main() {
-    serverInfo := getInfoServer()
-    if serverInfo.Error != nil {
-        fmt.Printf("Erro ao obter informações do servidor: %v\n", serverInfo.Error)
-        return
-    }
+	// Captura informações do servidor
+	serverInfo := lcme.GetInfoServer()
 
-    fmt.Printf("Memória total: %v MB\n", serverInfo.TotalMemory)
-    fmt.Printf("Memória usada: %v MB\n", serverInfo.UsedMemory)
-    fmt.Printf("Memória livre: %v MB\n", serverInfo.FreeMemory)
-    fmt.Printf("Uso da CPU: %f%%\n", serverInfo.CPUUsage)
-    fmt.Printf("Espaço total em disco: %v MB\n", serverInfo.TotalDiskSpace)
-    fmt.Printf("Espaço utilizado em disco: %v MB\n", serverInfo.UsedDiskSpace)
-    fmt.Printf("Espaço livre em disco: %v MB\n", serverInfo.FreeDiskSpace)
+	// Exibe os dados capturados (Exemplo para imprimir no console)
+	fmt.Printf("Distribuição Linux: %s\n", serverInfo.Distribution.Name)
+	fmt.Printf("Memória total: %d MB\n", serverInfo.RAM.Total)
+	// Continue para outras informações...
 }
 ```
 
+---
+
+### Tabela de Retornos
+
+A função `getInfoServer` retorna uma estrutura. A tabela a seguir detalha os campos retornados:
+
+| Campo                | Tipo           | Descrição                                                                           |
+|----------------------|----------------|-------------------------------------------------------------------------------------|
+| `Distribution.Name`   | `string`       | Nome da distribuição Linux instalada no servidor.                                   |
+| `RAM.Total`           | `uint64`       | Memória RAM total em megabytes (MB).                                                |
+| `RAM.Used`            | `uint64`       | Memória RAM usada em megabytes (MB).                                                |
+| `RAM.Available`       | `uint64`       | Memória RAM disponível em megabytes (MB).                                           |
+| `Disk.Total`          | `uint64`       | Espaço total em disco em megabytes (MB).                                            |
+| `Disk.Used`           | `uint64`       | Espaço em disco utilizado em megabytes (MB).                                        |
+| `Disk.Available`      | `uint64`       | Espaço em disco disponível em megabytes (MB).                                       |
+| `CPU.NumCores`        | `int`          | Número total de núcleos do processador.                                             |
+| `CPU.Usage`           | `float64`      | Percentual atual de uso do processador.                                             |
+| `Network.IPv4`        | `[]string`     | Lista de endereços IP IPv4 associados ao servidor.                                  |
+| `Network.IPv6`        | `[]string`     | Lista de endereços IP IPv6 associados ao servidor.                                  |
+
+---
+
+### Exemplos de Uso
+
+#### Exemplo 1: Capturar e Exibir Informações de Rede
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/GomdimApps/lcme"
+)
+
+func main() {
+	serverInfo := lcme.GetInfoServer()
+
+	// Exibir IPs IPv4
+	for _, ip := range serverInfo.Network.IPv4 {
+		fmt.Println("IP da máquina (IPv4):", ip)
+	}
+
+	// Exibir IPs IPv6
+	for _, ip := range serverInfo.Network.IPv6 {
+		fmt.Println("IP da máquina (IPv6):", ip)
+	}
+}
+```
+
+#### Exemplo 2: Capturar Informações de Memória
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/GomdimApps/lcme"
+)
+
+func main() {
+	serverInfo := lcme.GetInfoServer()
+
+	fmt.Printf("Memória total: %d MB\n", serverInfo.RAM.Total)
+	fmt.Printf("Memória usada: %d MB\n", serverInfo.RAM.Used)
+	fmt.Printf("Memória disponível: %d MB\n", serverInfo.RAM.Available)
+}
+```
+
+---
 

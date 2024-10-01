@@ -6,16 +6,19 @@ import (
 )
 
 type NetworkInfo struct {
-	IPs []string
+	IPv4 []string
+	IPv6 []string
 }
 
 func GetNetworkInfo() NetworkInfo {
-	var ips []string
+	var ipv4s, ipv6s []string
+
 	interfaces, err := net.Interfaces()
 	if err != nil {
 		fmt.Println("Error getting interfaces:", err)
-		return NetworkInfo{IPs: ips}
+		return NetworkInfo{IPv4: ipv4s, IPv6: ipv6s}
 	}
+
 	for _, iface := range interfaces {
 		addrs, err := iface.Addrs()
 		if err != nil {
@@ -30,9 +33,14 @@ func GetNetworkInfo() NetworkInfo {
 				ip = v.IP
 			}
 			if ip != nil && !ip.IsLoopback() {
-				ips = append(ips, ip.String())
+				if ip.To4() != nil {
+					ipv4s = append(ipv4s, ip.String())
+				} else if ip.To16() != nil {
+					ipv6s = append(ipv6s, ip.String())
+				}
 			}
 		}
 	}
-	return NetworkInfo{IPs: ips}
+
+	return NetworkInfo{IPv4: ipv4s, IPv6: ipv6s}
 }

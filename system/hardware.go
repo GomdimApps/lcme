@@ -3,6 +3,7 @@ package system
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/GomdimApps/lcme/utils"
 )
@@ -15,33 +16,34 @@ type HardwareInfo struct {
 }
 
 func GetHardwareInfo() HardwareInfo {
-	// kernel version
+	// Kernel version
 	kernelVersion, err := utils.Cexec("cat /proc/version | awk '{print $3}'")
 	if err != nil {
-		fmt.Printf("Error getting the kernel version: %v\n", err)
+		fmt.Printf("Error obtaining kernel version: %v\n", err)
 	}
 
 	// CPU cores
 	numCores, err := utils.Cexec("cat /proc/cpuinfo | grep 'cpu cores' | uniq | awk -F ': ' '{print $2}'")
 	if err != nil {
-		fmt.Printf("Error getting the number of CPU cores: %v\n", err)
+		fmt.Printf("Error obtaining CPU core count: %v\n", err)
 	}
 
 	// CPU frequency (in MHz)
 	cpuMHz, err := utils.Cexec("cat /proc/cpuinfo | grep 'cpu MHz' | uniq | awk -F ': ' '{print $2}'")
 	if err != nil {
-		fmt.Printf("Error obtaining the CPU frequency: %v\n", err)
+		fmt.Printf("Error obtaining CPU frequency: %v\n", err)
 	}
 
 	// Server uptime
 	uptimeStr, err := utils.Cexec("awk '{print int($1/60)}' /proc/uptime")
 	if err != nil {
-		fmt.Printf("Error getting the active time from the server: %v\n", err)
+		fmt.Printf("Error obtaining server uptime: %v\n", err)
 	}
 
+	uptimeStr = strings.TrimSpace(uptimeStr)
 	uptime, err := strconv.Atoi(uptimeStr)
 	if err != nil {
-		fmt.Printf("Error converting uptime to integer:  %v\n", err)
+		fmt.Printf("Error converting uptime to integer: %v\n", err)
 	}
 
 	return HardwareInfo{

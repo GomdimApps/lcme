@@ -28,13 +28,13 @@ O principal objetivo do LCME é fornecer uma solução simples e eficaz para o g
 go get github.com/GomdimApps/lcme
 ```
 
-# Bash
+# Shell
 
-Executa um comando Bash e retorna a saída padrão e um erro, se houver.
+Executa um comando Shell e retorna a saída padrão e um erro, se houver.
 
 #### Parâmetros
 
-- **`command`** (string): Comando Bash a ser executado.
+- **`command`** (string): Comando Shell a ser executado.
 
 #### Retornos
 
@@ -54,7 +54,7 @@ import (
 func main() {
     comando := "rm -r teste.txt" // Comando a ser executado
 
-    resultado, erro := lcme.Bash(comando)
+    resultado, erro := lcme.Shell(comando)
     if erro != nil {
         fmt.Println("Erro:", erro) // Exibe erro, se houver
     } else {
@@ -217,7 +217,10 @@ A função `getInfoServer` retorna uma estrutura. A tabela a seguir detalha os c
 | `CPU.Usage`           | `float64`      | Percentual atual de uso do processador.                                             |
 | `Network.IPv4`        | `[]string`     | Lista de endereços IP IPv4 associados ao servidor.                                  |
 | `Network.IPv6`        | `[]string`     | Lista de endereços IP IPv6 associados ao servidor.                                  |
-
+| `Hardware.KernelVersion` | `string`   | Versão do kernel do sistema operacional.                                            |
+| `Hardware.NumCores`   | `string`       | Número de núcleos da CPU. (faster return)                                           |
+| `Hardware.CPUMHz`     | `string`       | Frequência atual da CPU em megahertz (MHz).                                         |
+| `Hardware.Uptime`     | `int`          | Tempo de execução do servidor em minutos                                            |
 ---
 
 ### Exemplos de Uso

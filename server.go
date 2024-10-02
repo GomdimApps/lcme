@@ -2,6 +2,7 @@ package lcme
 
 import (
 	"github.com/GomdimApps/lcme/system"
+	"github.com/GomdimApps/lcme/utils"
 )
 
 type ServerInfo struct {
@@ -10,6 +11,7 @@ type ServerInfo struct {
 	Disk         system.DiskInfo
 	CPU          system.CPUInfo
 	Network      system.NetworkInfo
+	Hardware     system.HardwareInfo
 }
 
 func GetInfoServer() ServerInfo {
@@ -19,5 +21,10 @@ func GetInfoServer() ServerInfo {
 		Disk:         system.GetDiskInfo("/"),
 		CPU:          system.GetCPUInfo(),
 		Network:      system.GetNetworkInfo(),
+		Hardware:     system.GetHardwareInfo(),
 	}
+}
+
+func Shell(command string) (string, error) {
+	return utils.Cexec(command)
 }

@@ -219,7 +219,9 @@ A função `getInfoServer` retorna uma estrutura. A tabela a seguir detalha os c
 | `Network.IPv6`        | `[]string`     | Lista de endereços IP IPv6 associados ao servidor.                                  |
 | `Hardware.KernelVersion` | `string`   | Versão do kernel do sistema operacional.                                            |
 | `Hardware.ProcessorName` | `string`       | Nome do processador do servidor                                                  |
-| `Hardware.Uptime`     | `string`          | Tempo de execução do servidor em minutos                                            |
+| `Hardware.Uptime`     | `int`          | Tempo de execução do servidor em minutos                                            |
+| `Hardware.SwapTotal`    | `int`          | Memória Swap total em megabytes (MB).                                             |
+| `Hardware.SwapFree`    | `int`          | Memória Swap disponível em megabytes (MB).                                         |
 ---
 
 ### Exemplos de Uso

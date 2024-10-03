@@ -2,8 +2,6 @@ package system
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 
 	"github.com/GomdimApps/lcme/utils"
 )
@@ -12,6 +10,8 @@ type HardwareInfo struct {
 	KernelVersion string
 	ProcessorName string
 	Uptime        int
+	SwapTotal     int
+	SwapFree      int
 }
 
 func GetHardwareInfo() HardwareInfo {
@@ -33,14 +33,29 @@ func GetHardwareInfo() HardwareInfo {
 		fmt.Printf("Error obtaining server uptime: %v\n", err)
 	}
 
-	uptimeStr = strings.TrimSpace(uptimeStr)
-	uptime, err := strconv.Atoi(uptimeStr)
+	// Swap Total
+	swapTotalStr, err := utils.Cexec("cat /proc/meminfo | grep 'SwapTotal' | uniq | awk '{print $2}'")
 	if err != nil {
-		fmt.Printf("Error converting uptime to integer: %v\n", err)
+		fmt.Printf("Error obtaining server Swap Total: %v\n", err)
 	}
+
+	// Swap Free
+	swapFreeStr, err := utils.Cexec("cat /proc/meminfo | grep 'SwapFree' | uniq | awk '{print $2}'")
+	if err != nil {
+		fmt.Printf("Error obtaining server Swap free: %v\n", err)
+	}
+
+	// Convert String
+	ints, err := utils.PassInts(uptimeStr, swapTotalStr, swapFreeStr)
+	if err != nil {
+		fmt.Printf("Error converting values to integers: %v\n", err)
+	}
+
 	return HardwareInfo{
 		KernelVersion: kernelVersion,
 		ProcessorName: nameCpu,
-		Uptime:        uptime,
+		Uptime:        ints[0],
+		SwapTotal:     ints[1] / 1024,
+		SwapFree:      ints[2] / 1024,
 	}
 }

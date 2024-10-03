@@ -2,6 +2,8 @@ package system
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/GomdimApps/lcme/utils"
 )
@@ -9,7 +11,7 @@ import (
 type HardwareInfo struct {
 	KernelVersion string
 	ProcessorName string
-	Uptime        string
+	Uptime        int
 }
 
 func GetHardwareInfo() HardwareInfo {
@@ -31,9 +33,14 @@ func GetHardwareInfo() HardwareInfo {
 		fmt.Printf("Error obtaining server uptime: %v\n", err)
 	}
 
+	uptimeStr = strings.TrimSpace(uptimeStr)
+	uptime, err := strconv.Atoi(uptimeStr)
+	if err != nil {
+		fmt.Printf("Error converting uptime to integer: %v\n", err)
+	}
 	return HardwareInfo{
 		KernelVersion: kernelVersion,
 		ProcessorName: nameCpu,
-		Uptime:        uptimeStr,
+		Uptime:        uptime,
 	}
 }

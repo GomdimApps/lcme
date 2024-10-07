@@ -9,17 +9,8 @@ import (
 	"github.com/GomdimApps/lcme/utils"
 )
 
-type ServerInfo struct {
-	Distribution system.DistroInfo
-	RAM          system.RAMInfo
-	Disk         system.DiskInfo
-	CPU          system.CPUInfo
-	Network      system.NetworkInfo
-	Hardware     system.HardwareInfo
-}
-
-func GetInfoServer() ServerInfo {
-	return ServerInfo{
+func GetInfoServer() system.ServerInfo {
+	return system.ServerInfo{
 		Distribution: system.GetDistroInfo(),
 		RAM:          system.GetRAMInfo(),
 		Disk:         system.GetDiskInfo("/"),

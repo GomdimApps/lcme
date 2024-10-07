@@ -272,3 +272,41 @@ func main() {
 
 ---
 
+# Log
+
+A função `Log` é projetada para registrar mensagens em um arquivo de log. Isso é útil para manter um registro das atividades ou eventos que ocorrem em um programa.
+
+### Como Usar 
+
+```go
+package main
+
+import (
+    "github.com/GomdimApps/lcme"
+)
+
+func main() {
+    succerlog := lcme.Log("log.txt")
+
+    // Log messages
+    succerlog("First log message")
+    succerlog("Second log message")
+    succerlog("Third log message")
+}
+```
+
+### Passos para Usar a Função `Log`:
+
+1. **Especificar o Caminho do Arquivo de Log:**
+    ```go
+    succerlog := lcme.Log("log.txt")
+    ```
+    Aqui, `lcme.Log("log.txt")` a função que adiciona mensagens ao arquivo `log.txt`.
+
+2. **Registrar Mensagens no Arquivo de Log:**
+    ```go
+    succerlog("First log message")
+    succerlog("Second log message")
+    succerlog("Third log message")
+    ```
+    Cada chamada para `succerlog` adiciona uma nova linha ao arquivo `log.txt` com a mensagem fornecida.

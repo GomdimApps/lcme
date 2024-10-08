@@ -6,6 +6,9 @@ import (
 	"github.com/GomdimApps/lcme/utils"
 )
 
+// HardwareInfo is a structure that contains information about the server's hardware,
+// such as kernel version, processor name, uptime and swap information.
+// This information can be collected by the GetHardwareInfo function and is part of the information returned by GetInfoServer.
 type HardwareInfo struct {
 	KernelVersion string
 	ProcessorName string
@@ -14,6 +17,11 @@ type HardwareInfo struct {
 	SwapFree      int
 }
 
+// GetHardwareInfo is a function that retrieves information about the system's hardware.
+// It uses operating system commands to extract data about the kernel version,
+// the processor name, the server uptime and the swap area (total and free).
+// This data is then returned in the HardwareInfo structure.
+// The function is called within GetInfoServer to collect information about the server's hardware.
 func GetHardwareInfo() HardwareInfo {
 	// Kernel version
 	kernelVersion, err := utils.Cexec("cat /proc/version | awk '{print $3}'")

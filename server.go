@@ -9,9 +9,13 @@ import (
 	"github.com/GomdimApps/lcme/utils"
 )
 
+// GetInfoServer collects detailed information about the server, including
+// system distribution, RAM usage, disk space, CPU information,
+// network and hardware information.
 func GetInfoServer() system.ServerInfo {
+	distroInfo, _ := system.GetDistroInfo()
 	return system.ServerInfo{
-		Distribution: system.GetDistroInfo(),
+		Distribution: distroInfo,
 		RAM:          system.GetRAMInfo(),
 		Disk:         system.GetDiskInfo("/"),
 		CPU:          system.GetCPUInfo(),
@@ -20,10 +24,14 @@ func GetInfoServer() system.ServerInfo {
 	}
 }
 
+// Shell executes a command in the terminal and returns the result as a string,
+// along with an error if one occurs.
 func Shell(command string) (string, error) {
 	return utils.Cexec(command)
 }
 
+// Log returns a log function that writes messages to a specified .log file.
+// If the file does not have the .log extension, it displays an error.
 func Log(filePath string) func(string) {
 	if !strings.HasSuffix(filePath, ".log") {
 		fmt.Println("Error: The file must have a .log extension")

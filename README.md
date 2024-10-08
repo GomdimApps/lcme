@@ -1,5 +1,11 @@
 # LCME (Linux Content Management Engine)
 
+<img align="right" width="159px" src="./utils/framework/logo/logo.png">
+
+[![Release](https://img.shields.io/github/release/GomdimApps/lcme.svg?style=flat-square)](https://github.com/GomdimApps/lcme/releases/)
+[![Go Reference](https://pkg.go.dev/badge/github.com/GomdimApps/lcme?status.svg)](https://pkg.go.dev/github.com/GomdimApps/lcme?tab=doc)
+
+
 ### **Propósito do Framework LCME**
 
 O LCME é um framework projetado para facilitar a criação e gestão de conteúdo em aplicações web e aplicações de microserviços no Linux. Ele é leve e modular, permitindo que desenvolvedores integrem funcionalidades de gerenciamento de conteúdo de forma eficiente e escalável.
@@ -200,28 +206,89 @@ func main() {
 
 ---
 
-### Tabela de Retornos
+### Tabela de Distribuição
 
-A função `getInfoServer` retorna uma estrutura. A tabela a seguir detalha os campos retornados:
+| Campo                        | Tipo    | Descrição                                                                 |
+|------------------------------|---------|---------------------------------------------------------------------------|
+| `Distribution.PrettyName`     | `string`| Nome legível e completo da distribuição, geralmente inclui o nome e versão. |
+| `Distribution.Name`           | `string`| Nome da distribuição, como "Debian GNU/Linux".                            |
+| `Distribution.VersionID`      | `string`| ID da versão da distribuição (ex: "12").                                   |
+| `Distribution.Version`        | `string`| Descrição da versão da distribuição, geralmente inclui número e nome codinome (ex: "12 (bookworm)"). |
+| `Distribution.VersionCodeName`| `string`| Codinome da versão da distribuição, usado internamente (ex: "bookworm").  |
+| `Distribution.ID`             | `string`| Identificador único da distribuição (ex: "debian").                       |
+| `Distribution.HomeURL`        | `string`| URL do site principal da distribuição (ex: "https://www.debian.org/").    |
+| `Distribution.SupportURL`     | `string`| URL para obter suporte técnico da distribuição (ex: "https://www.debian.org/support"). |
+| `Distribution.BugReportURL`   | `string`| URL para reportar bugs da distribuição (ex: "https://bugs.debian.org/").  |
 
-| Campo                | Tipo           | Descrição                                                                           |
-|----------------------|----------------|-------------------------------------------------------------------------------------|
-| `Distribution.Name`   | `string`       | Nome da distribuição Linux instalada no servidor.                                   |
-| `RAM.Total`           | `uint64`       | Memória RAM total em megabytes (MB).                                                |
-| `RAM.Used`            | `uint64`       | Memória RAM usada em megabytes (MB).                                                |
-| `RAM.Available`       | `uint64`       | Memória RAM disponível em megabytes (MB).                                           |
-| `Disk.Total`          | `uint64`       | Espaço total em disco em megabytes (MB).                                            |
-| `Disk.Used`           | `uint64`       | Espaço em disco utilizado em megabytes (MB).                                        |
-| `Disk.Available`      | `uint64`       | Espaço em disco disponível em megabytes (MB).                                       |
-| `CPU.NumCores`        | `int`          | Número total de núcleos do processador.                                             |
-| `CPU.Usage`           | `float64`      | Percentual atual de uso do processador.                                             |
-| `Network.IPv4`        | `[]string`     | Lista de endereços IP IPv4 associados ao servidor.                                  |
-| `Network.IPv6`        | `[]string`     | Lista de endereços IP IPv6 associados ao servidor.                                  |
-| `Hardware.KernelVersion` | `string`   | Versão do kernel do sistema operacional.                                            |
-| `Hardware.ProcessorName` | `string`       | Nome do processador do servidor                                                  |
-| `Hardware.Uptime`     | `int`          | Tempo de execução do servidor em minutos                                            |
-| `Hardware.SwapTotal`    | `int`          | Memória Swap total em megabytes (MB).                                             |
-| `Hardware.SwapFree`    | `int`          | Memória Swap disponível em megabytes (MB).                                         |
+---
+
+### Tabela de Memória RAM
+
+| Campo              | Tipo    | Descrição                         |
+|--------------------|---------|-----------------------------------|
+| `RAM.Total`        | `uint64`| Memória RAM total em megabytes (MB). |
+| `RAM.Used`         | `uint64`| Memória RAM usada em megabytes (MB). |
+| `RAM.Available`    | `uint64`| Memória RAM disponível em megabytes (MB). |
+
+---
+
+### Tabela de Espaço em Disco
+
+| Campo             | Tipo    | Descrição                         |
+|-------------------|---------|-----------------------------------|
+| `Disk.Total`      | `uint64`| Espaço total em disco em megabytes (MB). |
+| `Disk.Used`       | `uint64`| Espaço em disco utilizado em megabytes (MB). |
+| `Disk.Available`  | `uint64`| Espaço em disco disponível em megabytes (MB). |
+
+---
+
+### Tabela de CPU
+
+| Campo              | Tipo      | Descrição                        |
+|--------------------|-----------|----------------------------------|
+| `CPU.NumCores`     | `int`     | Número total de núcleos do processador. |
+| `CPU.Usage`        | `float64` | Percentual atual de uso do processador. |
+
+---
+
+### Tabela de Rede IPv4
+
+| Campo                       | Tipo        | Descrição                                                   |
+|-----------------------------|-------------|-------------------------------------------------------------|
+| `Network.IPv4`               | `[]string`  | Lista de endereços IP IPv4 associados ao servidor.          |
+| `Network.IPv4Ports.TCP.Out`  | `[]string`  | Endereços de saída (`OUT`) para conexões TCP em IPv4.       |
+| `Network.IPv4Ports.TCP.In`   | `[]string`  | Endereços de entrada (`IN`) para conexões TCP em IPv4.      |
+| `Network.IPv4Ports.TCP.All`  | `[]string`  | Conexões TCP completas em IPv4, exibe tanto os endereços de saída quanto de entrada. |
+| `Network.IPv4Ports.UDP.Out`  | `[]string`  | Endereços de saída (`OUT`) para conexões UDP em IPv4.       |
+| `Network.IPv4Ports.UDP.In`   | `[]string`  | Endereços de entrada (`IN`) para conexões UDP em IPv4.      |
+| `Network.IPv4Ports.UDP.All`  | `[]string`  | Conexões UDP completas em IPv4, exibe tanto os endereços de saída quanto de entrada. |
+
+---
+
+### Tabela de Rede IPv6
+
+| Campo                       | Tipo        | Descrição                                                   |
+|-----------------------------|-------------|-------------------------------------------------------------|
+| `Network.IPv6`               | `[]string`  | Lista de endereços IP IPv6 associados ao servidor.          |
+| `Network.IPv6Ports.TCP.Out`  | `[]string`  | Endereços de saída (`OUT`) para conexões TCP em IPv6.       |
+| `Network.IPv6Ports.TCP.In`   | `[]string`  | Endereços de entrada (`IN`) para conexões TCP em IPv6.      |
+| `Network.IPv6Ports.TCP.All`  | `[]string`  | Conexões TCP completas em IPv6, exibe tanto os endereços de saída quanto de entrada. |
+| `Network.IPv6Ports.UDP.Out`  | `[]string`  | Endereços de saída (`OUT`) para conexões UDP em IPv6.       |
+| `Network.IPv6Ports.UDP.In`   | `[]string`  | Endereços de entrada (`IN`) para conexões UDP em IPv6.      |
+| `Network.IPv6Ports.UDP.All`  | `[]string`  | Conexões UDP completas em IPv6, exibe tanto os endereços de saída quanto de entrada. |
+
+---
+
+### Tabela de Hardware
+
+| Campo                    | Tipo      | Descrição                           |
+|--------------------------|-----------|-------------------------------------|
+| `Hardware.KernelVersion`  | `string`  | Versão do kernel do sistema operacional. |
+| `Hardware.ProcessorName`  | `string`  | Nome do processador do servidor.   |
+| `Hardware.Uptime`         | `int`     | Tempo de execução do servidor em minutos. |
+| `Hardware.SwapTotal`      | `int`     | Memória Swap total em megabytes (MB). |
+| `Hardware.SwapFree`       | `int`     | Memória Swap disponível em megabytes (MB). |
+
 ---
 
 ### Exemplos de Uso

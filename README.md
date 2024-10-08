@@ -206,7 +206,15 @@ A função `getInfoServer` retorna uma estrutura. A tabela a seguir detalha os c
 
 | Campo                | Tipo           | Descrição                                                                           |
 |----------------------|----------------|-------------------------------------------------------------------------------------|
-| `Distribution.Name`   | `string`       | Nome da distribuição Linux instalada no servidor.                                   |
+| `Distribution.PrettyName`       | `string`      | Nome legível e completo da distribuição, geralmente inclui o nome e versão.   |
+| `Distribution.Name`             | `string`      | Nome da distribuição, como "Debian GNU/Linux".                               |
+| `Distribution.VersionID`        | `string`      | ID da versão da distribuição (ex: "12").                                     |
+| `Distribution.Version`          | `string`      | Descrição da versão da distribuição, geralmente inclui o número e nome codinome (ex: "12 (bookworm)"). |
+| `Distribution.VersionCodeName`  | `string`      | Codinome da versão da distribuição, usado internamente (ex: "bookworm").      |
+| `Distribution.ID`               | `string`      | Identificador único da distribuição (ex: "debian").                          |
+| `Distribution.HomeURL`          | `string`      | URL do site principal da distribuição (ex: "https://www.debian.org/").       |
+| `Distribution.SupportURL`       | `string`      | URL para obter suporte técnico da distribuição (ex: "https://www.debian.org/support"). |
+| `Distribution.BugReportURL`     | `string`      | URL para reportar bugs da distribuição (ex: "https://bugs.debian.org/").     |
 | `RAM.Total`           | `uint64`       | Memória RAM total em megabytes (MB).                                                |
 | `RAM.Used`            | `uint64`       | Memória RAM usada em megabytes (MB).                                                |
 | `RAM.Available`       | `uint64`       | Memória RAM disponível em megabytes (MB).                                           |

@@ -10,8 +10,9 @@ import (
 )
 
 func GetInfoServer() system.ServerInfo {
+	distroInfo, _ := system.GetDistroInfo()
 	return system.ServerInfo{
-		Distribution: system.GetDistroInfo(),
+		Distribution: distroInfo,
 		RAM:          system.GetRAMInfo(),
 		Disk:         system.GetDiskInfo("/"),
 		CPU:          system.GetCPUInfo(),

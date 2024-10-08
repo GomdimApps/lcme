@@ -1,5 +1,11 @@
 # LCME (Linux Content Management Engine)
 
+<img align="right" width="159px" src="./utils/framework/logo/logo.png">
+
+[![Release](https://img.shields.io/github/release/GomdimApps/lcme.svg?style=flat-square)](https://github.com/GomdimApps/lcme/releases/)
+[![Go Reference](https://pkg.go.dev/badge/github.com/GomdimApps/lcme?status.svg)](https://pkg.go.dev/github.com/GomdimApps/lcme?tab=doc)
+
+
 ### **Propósito do Framework LCME**
 
 O LCME é um framework projetado para facilitar a criação e gestão de conteúdo em aplicações web e aplicações de microserviços no Linux. Ele é leve e modular, permitindo que desenvolvedores integrem funcionalidades de gerenciamento de conteúdo de forma eficiente e escalável.

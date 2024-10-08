@@ -3,21 +3,34 @@ package system
 import (
 	"fmt"
 	"net"
+	"strings"
+
+	"github.com/GomdimApps/lcme/utils"
 )
 
-// NetworkInfo is a structure that contains information about the system's network addresses.
-// It stores the IPv4 and IPv6 addresses found on the server's network interfaces.
-// This information can be collected by the GetNetworkInfo function and is part of the information returned by GetInfoServer.
-type NetworkInfo struct {
-	IPv4 []string
-	IPv6 []string
+// Address represents the network addresses for incoming, outgoing, and all connections.
+type Address struct {
+	Out []string
+	In  []string
+	All []string
 }
 
-// GetNetworkInfo is a function that retrieves information about the system's network interfaces.
-// It uses the net packet to obtain a list of network interfaces and their respective addresses.
-// The function checks each network address, ignoring loopback addresses,
-// and classifies them as IPv4 or IPv6. It returns this information in the NetworkInfo structure.
-// It is called within GetInfoServer to collect information about the server's network.
+// PortType represents the listening ports and their associated addresses.
+type PortType struct {
+	TCP Address
+	UDP Address
+}
+
+// NetworkInfo represents the system's network information, including IPs and ports.
+type NetworkInfo struct {
+	IPv4      []string
+	IPv6      []string
+	IPv4Ports PortType
+	IPv6Ports PortType
+}
+
+// GetNetworkInfo retrieves information about the system's network interfaces and
+// the TCP/UDP ports listening on IPv4 and IPv6.
 func GetNetworkInfo() NetworkInfo {
 
 	// Initializes lists to store IPv4 and IPv6 addresses.
@@ -28,6 +41,7 @@ func GetNetworkInfo() NetworkInfo {
 		return NetworkInfo{IPv4: ipv4s, IPv6: ipv6s}
 	}
 
+	// Process network interfaces to get IPv4 and IPv6 addresses.
 	for _, iface := range interfaces {
 		addrs, err := iface.Addrs()
 		if err != nil {
@@ -51,5 +65,47 @@ func GetNetworkInfo() NetworkInfo {
 		}
 	}
 
-	return NetworkInfo{IPv4: ipv4s, IPv6: ipv6s}
+	tcpIPv4 := getPortAddresses("ss -4 | grep 'tcp'", "5", "6")
+	udpIPv4 := getPortAddresses("ss -4 | grep 'udp'", "5", "6")
+	tcpIPv6 := getPortAddresses("ss -6 | grep 'tcp'", "5", "6")
+	udpIPv6 := getPortAddresses("ss -6 | grep 'udp'", "5", "6")
+
+	// Return the complete network information with separated addresses.
+	return NetworkInfo{
+		IPv4: ipv4s,
+		IPv6: ipv6s,
+		IPv4Ports: PortType{
+			TCP: tcpIPv4,
+			UDP: udpIPv4,
+		},
+		IPv6Ports: PortType{
+			TCP: tcpIPv6,
+			UDP: udpIPv6,
+		},
+	}
+}
+
+// getPortAddresses retrieves the outgoing, incoming, and both (all) addresses for a specific protocol (TCP/UDP).
+func getPortAddresses(command, outColumn, inColumn string) Address {
+	outAddrs, _ := getPorts(fmt.Sprintf("%s | awk '{print $%s}'", command, outColumn))
+	inAddrs, _ := getPorts(fmt.Sprintf("%s | awk '{print $%s}'", command, inColumn))
+	allAddrs, _ := getPorts(fmt.Sprintf("%s | awk '{print $%s \" > \" $%s}'", command, outColumn, inColumn))
+
+	return Address{
+		Out: outAddrs,
+		In:  inAddrs,
+		All: allAddrs,
+	}
+}
+
+// getPorts is a helper function to execute a command and return a list of ports or addresses.
+func getPorts(command string) ([]string, error) {
+	output, err := utils.Cexec(command)
+	if err != nil {
+		fmt.Println("Error getting ports:", err)
+		return []string{}, err
+	}
+
+	ports := strings.Split(strings.TrimSpace(output), "\n")
+	return ports, nil
 }

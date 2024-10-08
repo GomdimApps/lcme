@@ -7,9 +7,7 @@ import (
 	"github.com/GomdimApps/lcme/utils"
 )
 
-// DistroInfo is a structure that contains information about the operating system distribution.
-// It is used to store relevant system data, such as the name, version, support URL, among others.
-// This information can be collected using the GetDistroInfo function and is part of the information that GetInfoServer returns about the server.
+// DistroInfo contains information about the operating system distribution.
 type DistroInfo struct {
 	PrettyName      string
 	Name            string
@@ -22,28 +20,37 @@ type DistroInfo struct {
 	BugReportURL    string
 }
 
-// GetDistroInfo is a function that retrieves information about the operating system distribution.
-// It runs the command `cat /etc/os-release` to get details about the distribution and returns this information
-// in the DistroInfo structure. This function is called within GetInfoServer to collect the distribution data from the server.
+// GetDistroInfo retrieves information about the operating system distribution.
 func GetDistroInfo() (DistroInfo, error) {
 	output, err := utils.Cexec("cat /etc/os-release")
 	if err != nil {
 		fmt.Printf("Error retrieving distro info: %v\n", err)
-		return DistroInfo{
-			PrettyName:      "Unknown",
-			Name:            "Unknown",
-			VersionID:       "Unknown",
-			Version:         "Unknown",
-			VersionCodeName: "Unknown",
-			ID:              "Unknown",
-			HomeURL:         "Unknown",
-			SupportURL:      "Unknown",
-			BugReportURL:    "Unknown",
-		}, err
+		return unknownDistroInfo(), err
 	}
 
+	return parseDistroInfo(output), nil
+}
+
+// unknownDistroInfo returns a DistroInfo struct with "Unknown" values.
+func unknownDistroInfo() DistroInfo {
+	return DistroInfo{
+		PrettyName:      "Unknown",
+		Name:            "Unknown",
+		VersionID:       "Unknown",
+		Version:         "Unknown",
+		VersionCodeName: "Unknown",
+		ID:              "Unknown",
+		HomeURL:         "Unknown",
+		SupportURL:      "Unknown",
+		BugReportURL:    "Unknown",
+	}
+}
+
+// parseDistroInfo parses the output of /etc/os-release into a DistroInfo struct.
+func parseDistroInfo(output string) DistroInfo {
 	lines := strings.Split(output, "\n")
 	distroInfo := DistroInfo{}
+
 	for _, line := range lines {
 		parts := strings.SplitN(line, "=", 2)
 		if len(parts) != 2 {
@@ -74,5 +81,5 @@ func GetDistroInfo() (DistroInfo, error) {
 		}
 	}
 
-	return distroInfo, nil
+	return distroInfo
 }

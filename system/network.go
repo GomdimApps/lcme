@@ -32,29 +32,21 @@ type NetworkInfo struct {
 // GetNetworkInfo retrieves information about the system's network interfaces and
 // the TCP/UDP ports listening on IPv4 and IPv6.
 func GetNetworkInfo() NetworkInfo {
-
-	// Initializes lists to store IPv4 and IPv6 addresses.
 	var ipv4s, ipv6s []string
+
 	interfaces, err := net.Interfaces()
 	if err != nil {
 		fmt.Println("Error getting interfaces:", err)
 		return NetworkInfo{IPv4: ipv4s, IPv6: ipv6s}
 	}
 
-	// Process network interfaces to get IPv4 and IPv6 addresses.
 	for _, iface := range interfaces {
 		addrs, err := iface.Addrs()
 		if err != nil {
 			continue
 		}
 		for _, addr := range addrs {
-			var ip net.IP
-			switch v := addr.(type) {
-			case *net.IPNet:
-				ip = v.IP
-			case *net.IPAddr:
-				ip = v.IP
-			}
+			ip := extractIP(addr)
 			if ip != nil && !ip.IsLoopback() {
 				if ip.To4() != nil {
 					ipv4s = append(ipv4s, ip.String())
@@ -65,24 +57,29 @@ func GetNetworkInfo() NetworkInfo {
 		}
 	}
 
-	tcpIPv4 := getPortAddresses("ss -4 | grep 'tcp'", "5", "6")
-	udpIPv4 := getPortAddresses("ss -4 | grep 'udp'", "5", "6")
-	tcpIPv6 := getPortAddresses("ss -6 | grep 'tcp'", "5", "6")
-	udpIPv6 := getPortAddresses("ss -6 | grep 'udp'", "5", "6")
-
-	// Return the complete network information with separated addresses.
 	return NetworkInfo{
 		IPv4: ipv4s,
 		IPv6: ipv6s,
 		IPv4Ports: PortType{
-			TCP: tcpIPv4,
-			UDP: udpIPv4,
+			TCP: getPortAddresses("ss -4 | grep 'tcp'", "5", "6"),
+			UDP: getPortAddresses("ss -4 | grep 'udp'", "5", "6"),
 		},
 		IPv6Ports: PortType{
-			TCP: tcpIPv6,
-			UDP: udpIPv6,
+			TCP: getPortAddresses("ss -6 | grep 'tcp'", "5", "6"),
+			UDP: getPortAddresses("ss -6 | grep 'udp'", "5", "6"),
 		},
 	}
+}
+
+// extractIP extracts the IP address from a net.Addr.
+func extractIP(addr net.Addr) net.IP {
+	switch v := addr.(type) {
+	case *net.IPNet:
+		return v.IP
+	case *net.IPAddr:
+		return v.IP
+	}
+	return nil
 }
 
 // getPortAddresses retrieves the outgoing, incoming, and both (all) addresses for a specific protocol (TCP/UDP).
@@ -103,9 +100,8 @@ func getPorts(command string) ([]string, error) {
 	output, err := utils.Cexec(command)
 	if err != nil {
 		fmt.Println("Error getting ports:", err)
-		return []string{}, err
+		return nil, err
 	}
 
-	ports := strings.Split(strings.TrimSpace(output), "\n")
-	return ports, nil
+	return strings.Split(strings.TrimSpace(output), "\n"), nil
 }

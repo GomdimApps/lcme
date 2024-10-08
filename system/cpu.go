@@ -9,17 +9,25 @@ import (
 	"time"
 )
 
+// CPUInfo is a structure that contains information about the server's processor.
+// It includes the number of CPU cores and the current CPU usage (in percent).
+// This structure is used by the GetCPUInfo function, which is called in the GetInfoServer function
+// function to collect information about the processor.
 type CPUInfo struct {
 	NumCores int
 	Usage    float64
 }
 
+// GetCPUInfo returns information about the server's processor, including the number of cores and the current CPU usage.
+// It is called within the GetInfoServer function to obtain information about the server's processor.
 func GetCPUInfo() CPUInfo {
 	numCores := runtime.NumCPU()
 	usage := getCPUUsage()
 	return CPUInfo{NumCores: numCores, Usage: usage}
 }
 
+// getCPUUsage calculates the current CPU usage by comparing the CPU times at two points in time,
+// with a 1 second wait between them.
 func getCPUUsage() float64 {
 	idle0, total0 := getCPUTimes()
 	time.Sleep(1 * time.Second)
@@ -29,6 +37,8 @@ func getCPUUsage() float64 {
 	return 100 * (1 - idleTicks/totalTicks)
 }
 
+// getCPUTimes reads the /proc/stat file to get the CPU usage times.
+// This method is used internally to calculate CPU usage in getCPUUsage.
 func getCPUTimes() (idle, total uint64) {
 	file, err := os.Open("/proc/stat")
 	if err != nil {

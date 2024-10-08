@@ -7,6 +7,9 @@ import (
 	"github.com/GomdimApps/lcme/utils"
 )
 
+// DistroInfo is a structure that contains information about the operating system distribution.
+// It is used to store relevant system data, such as the name, version, support URL, among others.
+// This information can be collected using the GetDistroInfo function and is part of the information that GetInfoServer returns about the server.
 type DistroInfo struct {
 	PrettyName      string
 	Name            string
@@ -19,6 +22,9 @@ type DistroInfo struct {
 	BugReportURL    string
 }
 
+// GetDistroInfo is a function that retrieves information about the operating system distribution.
+// It runs the command `cat /etc/os-release` to get details about the distribution and returns this information
+// in the DistroInfo structure. This function is called within GetInfoServer to collect the distribution data from the server.
 func GetDistroInfo() (DistroInfo, error) {
 	output, err := utils.Cexec("cat /etc/os-release")
 	if err != nil {

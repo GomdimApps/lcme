@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+// ConfigRead reads a configuration file and fills the 'config' struct with the values found.
+// The file must have lines in the format key=value and the keys must correspond to the fields in the struct.
 func ConfigRead(filename string, config interface{}) error {
 	file, err := os.Open(filename)
 	if err != nil {

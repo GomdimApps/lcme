@@ -5,14 +5,23 @@ import (
 	"net"
 )
 
+// NetworkInfo is a structure that contains information about the system's network addresses.
+// It stores the IPv4 and IPv6 addresses found on the server's network interfaces.
+// This information can be collected by the GetNetworkInfo function and is part of the information returned by GetInfoServer.
 type NetworkInfo struct {
 	IPv4 []string
 	IPv6 []string
 }
 
+// GetNetworkInfo is a function that retrieves information about the system's network interfaces.
+// It uses the net packet to obtain a list of network interfaces and their respective addresses.
+// The function checks each network address, ignoring loopback addresses,
+// and classifies them as IPv4 or IPv6. It returns this information in the NetworkInfo structure.
+// It is called within GetInfoServer to collect information about the server's network.
 func GetNetworkInfo() NetworkInfo {
-	var ipv4s, ipv6s []string
 
+	// Initializes lists to store IPv4 and IPv6 addresses.
+	var ipv4s, ipv6s []string
 	interfaces, err := net.Interfaces()
 	if err != nil {
 		fmt.Println("Error getting interfaces:", err)

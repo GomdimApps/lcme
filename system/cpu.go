@@ -19,22 +19,20 @@ type CPUInfo struct {
 func GetCPUInfo() CPUInfo {
 	return CPUInfo{
 		NumCores: runtime.NumCPU(),
-		Usage:    getCPUUsage(),
+		Usage:    calculateCPUUsage(),
 	}
 }
 
-// getCPUUsage calculates the current CPU usage by comparing the CPU times at two points in time, with a 1-second interval.
-func getCPUUsage() float64 {
-	idle0, total0 := getCPUTimes()
+// calculateCPUUsage calculates the current CPU usage by comparing the CPU times at two points in time, with a 1-second interval.
+func calculateCPUUsage() float64 {
+	idle0, total0 := readCPUTimes()
 	time.Sleep(1 * time.Second)
-	idle1, total1 := getCPUTimes()
-	idleTicks := float64(idle1 - idle0)
-	totalTicks := float64(total1 - total0)
-	return 100 * (1 - idleTicks/totalTicks)
+	idle1, total1 := readCPUTimes()
+	return computeUsage(idle0, total0, idle1, total1)
 }
 
-// getCPUTimes reads the /proc/stat file to get the CPU usage times.
-func getCPUTimes() (idle, total uint64) {
+// readCPUTimes reads the /proc/stat file to get the CPU usage times.
+func readCPUTimes() (idle, total uint64) {
 	file, err := os.Open("/proc/stat")
 	if err != nil {
 		return 0, 0
@@ -45,8 +43,7 @@ func getCPUTimes() (idle, total uint64) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		if strings.HasPrefix(line, "cpu ") {
-			fields := strings.Fields(line)
-			return parseCPUTimes(fields)
+			return parseCPUTimes(strings.Fields(line))
 		}
 	}
 	return 0, 0
@@ -54,13 +51,27 @@ func getCPUTimes() (idle, total uint64) {
 
 // parseCPUTimes parses the CPU times from the fields of the /proc/stat file.
 func parseCPUTimes(fields []string) (idle, total uint64) {
-	user, _ := strconv.ParseUint(fields[1], 10, 64)
-	nice, _ := strconv.ParseUint(fields[2], 10, 64)
-	system, _ := strconv.ParseUint(fields[3], 10, 64)
-	idle, _ = strconv.ParseUint(fields[4], 10, 64)
-	iowait, _ := strconv.ParseUint(fields[5], 10, 64)
-	irq, _ := strconv.ParseUint(fields[6], 10, 64)
-	softirq, _ := strconv.ParseUint(fields[7], 10, 64)
-	total = user + nice + system + idle + iowait + irq + softirq
+	var times [7]uint64
+	for i := 1; i <= 7; i++ {
+		times[i-1], _ = strconv.ParseUint(fields[i], 10, 64)
+	}
+	idle = times[3]
+	total = sum(times[:])
 	return idle, total
+}
+
+// sum calculates the sum of a slice of uint64.
+func sum(values []uint64) uint64 {
+	var total uint64
+	for _, value := range values {
+		total += value
+	}
+	return total
+}
+
+// computeUsage calculates the CPU usage percentage.
+func computeUsage(idle0, total0, idle1, total1 uint64) float64 {
+	idleTicks := float64(idle1 - idle0)
+	totalTicks := float64(total1 - total0)
+	return 100 * (1 - idleTicks/totalTicks)
 }

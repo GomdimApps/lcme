@@ -33,6 +33,11 @@ func ConfigRead(filename string, config interface{}) error {
 		key := strings.TrimSpace(parts[0])
 		value := strings.TrimSpace(parts[1])
 
+		// Check if the value is empty
+		if value == "" {
+			return fmt.Errorf("value for key %s is empty", key)
+		}
+
 		v := reflect.ValueOf(config).Elem()
 		field := v.FieldByName(key)
 		// If the field doesn't exist, ignore it

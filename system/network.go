@@ -1,27 +1,28 @@
 package system
 
 import (
+	"bufio"
 	"fmt"
 	"net"
+	"os"
+	"strconv"
 	"strings"
-
-	"github.com/GomdimApps/lcme/utils"
 )
 
-// Address represents the network addresses for incoming, outgoing, and all connections.
+// Address holds the outgoing, incoming, and both (all) addresses.
 type Address struct {
 	Out []string
 	In  []string
 	All []string
 }
 
-// PortType represents the listening ports and their associated addresses.
+// PortType holds the TCP and UDP addresses.
 type PortType struct {
 	TCP Address
 	UDP Address
 }
 
-// NetworkInfo represents the system's network information, including IPs and ports.
+// NetworkInfo holds the network information.
 type NetworkInfo struct {
 	IPv4      []string
 	IPv6      []string
@@ -29,46 +30,44 @@ type NetworkInfo struct {
 	IPv6Ports PortType
 }
 
-// GetNetworkInfo retrieves information about the system's network interfaces and
-// the TCP/UDP ports listening on IPv4 and IPv6.
+// GetNetworkInfo retrieves the network information.
 func GetNetworkInfo() NetworkInfo {
-	var ipv4s, ipv6s []string
-
-	interfaces, err := net.Interfaces()
-	if err != nil {
-		fmt.Println("Error getting interfaces:", err)
-		return NetworkInfo{IPv4: ipv4s, IPv6: ipv6s}
-	}
-
-	for _, iface := range interfaces {
-		addrs, err := iface.Addrs()
-		if err != nil {
-			continue
-		}
-		for _, addr := range addrs {
-			ip := extractIP(addr)
-			if ip != nil && !ip.IsLoopback() {
-				if ip.To4() != nil {
-					ipv4s = append(ipv4s, ip.String())
-				} else if ip.To16() != nil {
-					ipv6s = append(ipv6s, ip.String())
-				}
-			}
-		}
-	}
-
+	ipv4s, ipv6s := getIPAddresses()
 	return NetworkInfo{
 		IPv4: ipv4s,
 		IPv6: ipv6s,
 		IPv4Ports: PortType{
-			TCP: getPortAddresses("ss -4 | grep 'tcp'", "5", "6"),
-			UDP: getPortAddresses("ss -4 | grep 'udp'", "5", "6"),
+			TCP: getPortAddresses("/proc/net/tcp"),
+			UDP: getPortAddresses("/proc/net/udp"),
 		},
 		IPv6Ports: PortType{
-			TCP: getPortAddresses("ss -6 | grep 'tcp'", "5", "6"),
-			UDP: getPortAddresses("ss -6 | grep 'udp'", "5", "6"),
+			TCP: getPortAddresses("/proc/net/tcp6"),
+			UDP: getPortAddresses("/proc/net/udp6"),
 		},
 	}
+}
+
+// getIPAddresses retrieves the IPv4 and IPv6 addresses.
+func getIPAddresses() ([]string, []string) {
+	var ipv4s, ipv6s []string
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		fmt.Println("Error getting IP addresses:", err)
+		return nil, nil
+	}
+
+	for _, addr := range addrs {
+		ip := extractIP(addr)
+		if ip == nil {
+			continue
+		}
+		if ip.To4() != nil {
+			ipv4s = append(ipv4s, ip.String())
+		} else {
+			ipv6s = append(ipv6s, ip.String())
+		}
+	}
+	return ipv4s, ipv6s
 }
 
 // extractIP extracts the IP address from a net.Addr.
@@ -83,10 +82,37 @@ func extractIP(addr net.Addr) net.IP {
 }
 
 // getPortAddresses retrieves the outgoing, incoming, and both (all) addresses for a specific protocol (TCP/UDP).
-func getPortAddresses(command, outColumn, inColumn string) Address {
-	outAddrs, _ := getPorts(fmt.Sprintf("%s | awk '{print $%s}'", command, outColumn))
-	inAddrs, _ := getPorts(fmt.Sprintf("%s | awk '{print $%s}'", command, inColumn))
-	allAddrs, _ := getPorts(fmt.Sprintf("%s | awk '{print $%s \" > \" $%s}'", command, outColumn, inColumn))
+func getPortAddresses(procFile string) Address {
+	var outAddrs, inAddrs, allAddrs []string
+
+	file, err := os.Open(procFile)
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return Address{}
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	// Skip the header line
+	scanner.Scan()
+	for scanner.Scan() {
+		line := scanner.Text()
+		fields := strings.Fields(line)
+		if len(fields) < 10 {
+			continue
+		}
+
+		localAddr := parseAddress(fields[1])
+		remoteAddr := parseAddress(fields[2])
+
+		outAddrs = append(outAddrs, localAddr)
+		inAddrs = append(inAddrs, remoteAddr)
+		allAddrs = append(allAddrs, fmt.Sprintf("%s > %s", localAddr, remoteAddr))
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Error reading file:", err)
+	}
 
 	return Address{
 		Out: outAddrs,
@@ -95,13 +121,39 @@ func getPortAddresses(command, outColumn, inColumn string) Address {
 	}
 }
 
-// getPorts is a helper function to execute a command and return a list of ports or addresses.
-func getPorts(command string) ([]string, error) {
-	output, err := utils.Cexec(command)
-	if err != nil {
-		fmt.Println("Error getting ports:", err)
-		return nil, err
+// parseAddress parses an address in the form "IP:Port".
+func parseAddress(addr string) string {
+	parts := strings.Split(addr, ":")
+	if len(parts) != 2 {
+		return ""
 	}
+	ip := parseIP(parts[0])
+	port := parsePort(parts[1])
+	return fmt.Sprintf("%s:%d", ip, port)
+}
 
-	return strings.Split(strings.TrimSpace(output), "\n"), nil
+// parseIP parses a hexadecimal IP address.
+func parseIP(hexIP string) string {
+	if len(hexIP) == 8 { // IPv4
+		ip := make(net.IP, 4)
+		for i := 0; i < 4; i++ {
+			byteVal, _ := strconv.ParseUint(hexIP[i*2:i*2+2], 16, 8)
+			ip[3-i] = byte(byteVal)
+		}
+		return ip.String()
+	} else if len(hexIP) == 32 { // IPv6
+		ip := make(net.IP, 16)
+		for i := 0; i < 16; i++ {
+			byteVal, _ := strconv.ParseUint(hexIP[i*2:i*2+2], 16, 8)
+			ip[15-i] = byte(byteVal)
+		}
+		return ip.String()
+	}
+	return ""
+}
+
+// parsePort parses a hexadecimal port number.
+func parsePort(hexPort string) uint16 {
+	port, _ := strconv.ParseUint(hexPort, 16, 16)
+	return uint16(port)
 }

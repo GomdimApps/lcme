@@ -134,12 +134,22 @@ func parseAddress(addr string) string {
 
 // parseIP parses a hexadecimal IP address.
 func parseIP(hexIP string) string {
-	ip := make(net.IP, 4)
-	for i := 0; i < 4; i++ {
-		byteVal, _ := strconv.ParseUint(hexIP[i*2:i*2+2], 16, 8)
-		ip[3-i] = byte(byteVal)
+	if len(hexIP) == 8 { // IPv4
+		ip := make(net.IP, 4)
+		for i := 0; i < 4; i++ {
+			byteVal, _ := strconv.ParseUint(hexIP[i*2:i*2+2], 16, 8)
+			ip[3-i] = byte(byteVal)
+		}
+		return ip.String()
+	} else if len(hexIP) == 32 { // IPv6
+		ip := make(net.IP, 16)
+		for i := 0; i < 16; i++ {
+			byteVal, _ := strconv.ParseUint(hexIP[i*2:i*2+2], 16, 8)
+			ip[15-i] = byte(byteVal)
+		}
+		return ip.String()
 	}
-	return ip.String()
+	return ""
 }
 
 // parsePort parses a hexadecimal port number.

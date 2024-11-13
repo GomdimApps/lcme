@@ -339,6 +339,46 @@ func main() {
 
 ---
 
+# GetFolderSize
+
+A função `GetFolderSize` é utilizada para calcular o tamanho de uma pasta específica em kilobytes (KB). Ela percorre recursivamente todos os arquivos e subdiretórios dentro do diretório especificado e soma o tamanho de cada arquivo.
+
+### Parâmetros
+
+- **`path`** (string): Caminho do diretório cuja soma dos tamanhos dos arquivos será calculada.
+
+### Retornos
+
+- **`uint64`**: Tamanho total da pasta em kilobytes (KB).
+- **`error`**: Descrição do erro, se ocorrer. Se o usuário não tiver permissão para acessar algum arquivo ou diretório, um erro de permissão será retornado.
+
+### Exemplo de Uso
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/GomdimApps/lcme"
+)
+
+func main() {
+	size, err := lcme.GetFolderSize("/root")
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+	} else {
+		fmt.Printf("Size of /root: %d KB\n", size)
+	}
+}
+```
+
+### Comportamento
+
+- Retorna o tamanho total da pasta em kilobytes (KB) se bem-sucedido.
+- Retorna um erro descritivo se ocorrer um problema ao acessar algum arquivo ou diretório, incluindo erros de permissão.
+
+---
+
 # Log
 
 A função `Log` é projetada para registrar mensagens em um arquivo de log. Isso é útil para manter um registro das atividades ou eventos que ocorrem em um programa.
@@ -377,3 +417,5 @@ func main() {
     succerlog("Third log message")
     ```
     Cada chamada para `succerlog` adiciona uma nova linha ao arquivo `log.txt` com a mensagem fornecida.
+
+

@@ -53,3 +53,12 @@ func Log(filePath string) func(string) {
 		}
 	}
 }
+
+// GetFolderSize returns the size of the specified folder in bytes.
+func GetFolderSize(path string) (uint64, error) {
+	size, err := system.GetFolderSize(path)
+	if err != nil {
+		return 0, fmt.Errorf("error getting folder size: %v", err)
+	}
+	return size, nil
+}

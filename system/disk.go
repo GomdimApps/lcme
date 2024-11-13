@@ -1,6 +1,9 @@
 package system
 
 import (
+	"fmt"
+	"os"
+	"path/filepath"
 	"syscall"
 )
 
@@ -28,4 +31,25 @@ func GetDiskInfo(path string) DiskInfo {
 	free := (stat.Bfree * uint64(blockSize)) / (1024 * 1024)
 	used := total - free
 	return DiskInfo{Total: total, Used: used, Available: free}
+}
+
+// GetFolderSize returns the size of the specified folder in bytes.
+func GetFolderSize(path string) (uint64, error) {
+	var size uint64
+	err := filepath.Walk(path, func(_ string, info os.FileInfo, err error) error {
+		if err != nil {
+			if os.IsPermission(err) {
+				return fmt.Errorf("permission denied: %v", err)
+			}
+			return err
+		}
+		if !info.IsDir() {
+			size += uint64(info.Size())
+		}
+		return nil
+	})
+	if err != nil {
+		return 0, err
+	}
+	return size / 1024, nil
 }

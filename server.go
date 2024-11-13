@@ -83,11 +83,16 @@ func GetFileInfo(dir string, files ...string) ([]system.FileInfo, error) {
 		} else if err != nil {
 			return nil, fmt.Errorf("error capturing file information: %v", err)
 		}
+		extension := strings.TrimPrefix(filepath.Ext(file), ".")
+		if extension == "" {
+			extension = ""
+		}
 		fileInfos = append(fileInfos, system.FileInfo{
 			FileName:          info.Name(),
 			FileSize:          info.Size() / 1024,
 			FileLastChange:    info.ModTime(),
 			FileUserPermisson: info.Mode(),
+			FileExtension:     extension,
 		})
 	}
 	return fileInfos, nil

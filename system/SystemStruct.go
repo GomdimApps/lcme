@@ -23,4 +23,5 @@ type FileInfo struct {
 	FileSize          int64
 	FileLastChange    time.Time
 	FileUserPermisson os.FileMode
+	FileExtension     string
 }

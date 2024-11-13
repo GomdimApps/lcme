@@ -3,6 +3,7 @@ package lcme
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/GomdimApps/lcme/system"
@@ -61,4 +62,35 @@ func GetFolderSize(path string) (uint64, error) {
 		return 0, fmt.Errorf("error getting folder size: %v", err)
 	}
 	return size, nil
+}
+
+// GetFileInfo returns information about the specified files in the given directory.
+func GetFileInfo(dir string, files []string) ([]system.FileInfo, error) {
+	var fileInfos []system.FileInfo
+
+	// Check if the directory is accessible
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		return nil, fmt.Errorf("directory not found: %v", err)
+	} else if err != nil {
+		return nil, fmt.Errorf("unable to access directory: %v", err)
+	}
+
+	for _, file := range files {
+		filePath := filepath.Join(dir, file)
+		info, err := os.Stat(filePath)
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("file not found: %s", file)
+		} else if err != nil {
+			return nil, fmt.Errorf("error capturing file information: %v", err)
+		}
+
+		fileInfos = append(fileInfos, system.FileInfo{
+			FileName:          info.Name(),
+			FileSize:          info.Size() / 1024,
+			FileLastChange:    info.ModTime(),
+			FileUserPermisson: info.Mode(),
+		})
+	}
+
+	return fileInfos, nil
 }

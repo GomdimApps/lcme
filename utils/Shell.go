@@ -3,14 +3,19 @@ package utils
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"os/exec"
 )
 
-// Cexec executes a command in bash and captures the standard output (stdout) and errors (stderr).
-// This function was created to be used by other functions that need to execute commands in the operating system.
-// It returns the output of the command as a string and any errors that occur during execution.
+// Cexec executes a command in the default shell and captures the standard output (stdout) and errors (stderr).
+// It identifies the shell being used by checking the SHELL environment variable.
 func Cexec(command string) (string, error) {
-	cmd := exec.Command("bash", "-c", command)
+	shell := os.Getenv("SHELL")
+	if shell == "" {
+		shell = "sh" // Default to "sh" if SHELL is not set
+	}
+
+	cmd := exec.Command(shell, "-c", command)
 
 	var out bytes.Buffer
 	cmd.Stdout = &out

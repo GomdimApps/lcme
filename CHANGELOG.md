@@ -1,3 +1,25 @@
+## Versão 1.1.5
+
+#### Novas Funcionalidades
+- **Função GetFolderSize**: Adicionada a função 
+
+GetFolderSize
+
+ para calcular o tamanho de uma pasta em kilobytes.
+- **Função GetFileInfo**: Adicionada a função 
+
+GetFileInfo
+
+ para obter informações detalhadas sobre arquivos específicos em um diretório. A função agora aceita nomes de arquivos variádicos.
+
+#### Alterado
+- **Documentação Atualizada**: Adicionada documentação para a função 
+
+
+Essas mudanças visam melhorar a funcionalidade de gerenciamento de arquivos e diretórios, proporcionando maior flexibilidade e detalhamento na captura de informações.
+
+---
+
 ## Versão 1.1.4.1
 
 ### Refatoração de `configs.go`
@@ -48,3 +70,5 @@ Essas mudanças visam melhorar a estabilidade e a compatibilidade geral do proje
 
 #### Correções
 - **Correção de Lógica**: Corrigidos erros na lógica de processamento, resultando em maior estabilidade do sistema.
+
+

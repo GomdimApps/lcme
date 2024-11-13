@@ -415,7 +415,7 @@ func main() {
 	// Como estamos capturando apenas um arquivo, pegamos o primeiro elemento da lista
 	fileInfo := fileInfos[0]
 	fmt.Printf("FileName: %s\n", fileInfo.FileName)
-	fmt.Printf("FileSize: %d bytes\n", fileInfo.FileSize)
+	fmt.Printf("FileSize: %d KB\n", fileInfo.FileSize)
 	fmt.Printf("FileLastChange: %s\n", fileInfo.FileLastChange)
 	fmt.Printf("FileUserPermisson: %s\n", fileInfo.FileUserPermisson)
 }
@@ -440,7 +440,7 @@ func main() {
 
 	for _, fileInfo := range fileInfos {
 		fmt.Printf("FileName: %s\n", fileInfo.FileName)
-		fmt.Printf("FileSize: %d bytes\n", fileInfo.FileSize)
+		fmt.Printf("FileSize: %d KB\n", fileInfo.FileSize)
 		fmt.Printf("FileLastChange: %s\n", fileInfo.FileLastChange)
 		fmt.Printf("FileUserPermisson: %s\n", fileInfo.FileUserPermisson)
 	}

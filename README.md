@@ -379,6 +379,78 @@ func main() {
 
 ---
 
+# GetFileInfo
+
+A função `GetFileInfo` é utilizada para obter informações detalhadas sobre arquivos específicos em um diretório fornecido. Ela pode lidar tanto com a captura de informações de um único arquivo quanto de múltiplos arquivos. 
+
+#### Parâmetros
+- **`dir`** (string): O caminho do diretório onde os arquivos estão localizados.
+- **`files`** (variadic string): Um ou mais nomes de arquivos para os quais as informações serão capturadas.
+
+#### Retornos
+A estrutura contém as seguintes informações sobre um arquivo:
+- **`FileName`**: O nome do arquivo.
+- **`FileSize`**: O tamanho do arquivo em bytes.
+- **`FileLastChange`**: A data e hora da última modificação do arquivo.
+- **`FileUserPermisson`**: As permissões do arquivo.
+
+#### Exemplo de Uso
+
+##### Capturar informações de um único arquivo:
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/GomdimApps/lcme"
+)
+
+func main() {
+	fileInfos, err := lcme.GetFileInfo("/root", ".bashrc")
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	// Como estamos capturando apenas um arquivo, pegamos o primeiro elemento da lista
+	fileInfo := fileInfos[0]
+	fmt.Printf("FileName: %s\n", fileInfo.FileName)
+	fmt.Printf("FileSize: %d bytes\n", fileInfo.FileSize)
+	fmt.Printf("FileLastChange: %s\n", fileInfo.FileLastChange)
+	fmt.Printf("FileUserPermisson: %s\n", fileInfo.FileUserPermisson)
+}
+```
+
+##### Capturar informações de múltiplos arquivos:
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/GomdimApps/lcme"
+)
+
+func main() {
+	files := []string{".bashrc", "Dockerfile"}
+	fileInfos, err := lcme.GetFileInfo("/root", files...)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	for _, fileInfo := range fileInfos {
+		fmt.Printf("FileName: %s\n", fileInfo.FileName)
+		fmt.Printf("FileSize: %d bytes\n", fileInfo.FileSize)
+		fmt.Printf("FileLastChange: %s\n", fileInfo.FileLastChange)
+		fmt.Printf("FileUserPermisson: %s\n", fileInfo.FileUserPermisson)
+	}
+}
+```
+
+Com essa função, você pode facilmente obter informações detalhadas sobre arquivos específicos em um diretório, seja para um único arquivo ou para múltiplos arquivos.
+
+---
+
 # Log
 
 A função `Log` é projetada para registrar mensagens em um arquivo de log. Isso é útil para manter um registro das atividades ou eventos que ocorrem em um programa.

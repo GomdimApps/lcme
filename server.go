@@ -65,16 +65,15 @@ func GetFolderSize(path string) (uint64, error) {
 }
 
 // GetFileInfo returns information about the specified files in the given directory.
-func GetFileInfo(dir string, files []string) ([]system.FileInfo, error) {
+// If only one file is specified, it returns a slice with one element.
+func GetFileInfo(dir string, files ...string) ([]system.FileInfo, error) {
 	var fileInfos []system.FileInfo
-
 	// Check if the directory is accessible
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		return nil, fmt.Errorf("directory not found: %v", err)
 	} else if err != nil {
 		return nil, fmt.Errorf("unable to access directory: %v", err)
 	}
-
 	for _, file := range files {
 		filePath := filepath.Join(dir, file)
 		info, err := os.Stat(filePath)
@@ -83,7 +82,6 @@ func GetFileInfo(dir string, files []string) ([]system.FileInfo, error) {
 		} else if err != nil {
 			return nil, fmt.Errorf("error capturing file information: %v", err)
 		}
-
 		fileInfos = append(fileInfos, system.FileInfo{
 			FileName:          info.Name(),
 			FileSize:          info.Size() / 1024,
@@ -91,6 +89,5 @@ func GetFileInfo(dir string, files []string) ([]system.FileInfo, error) {
 			FileUserPermisson: info.Mode(),
 		})
 	}
-
 	return fileInfos, nil
 }

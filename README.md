@@ -279,6 +279,36 @@ func main() {
 
 ---
 
+### Tabela de Rede (NetworkRate)
+
+| Campo                       | Tipo        | Descrição                                                   |
+|-----------------------------|-------------|-------------------------------------------------------------|
+| `Network.Download`          | `int64`     |  Taxa de download em kilobytes por segundo (KBps)           |
+| `Network.Upload`            | `int64`     | Taxa de upload em kilobytes por segundo (KBps).             |
+
+
+### Exemplos de Uso (NetworkRate)
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/GomdimApps/lcme"
+)
+
+func main() {
+	serverInfo := lcme.GetInfoServer()
+
+	fmt.Printf("Download: %d KB\n", serverInfo.Network.Download)
+	fmt.Printf("Upload: %d KB\n", serverInfo.Network.Upload)
+
+}
+```
+
+---
+
 ### Tabela de Hardware
 
 | Campo                    | Tipo      | Descrição                           |
@@ -490,4 +520,29 @@ func main() {
     ```
     Cada chamada para `succerlog` adiciona uma nova linha ao arquivo `log.txt` com a mensagem fornecida.
 
+# MonitorNetworkRates
+
+A função `MonitorNetworkRates` é utilizada para monitorar continuamente as taxas de download e upload da interface de rede ativa. Ela retorna um canal através do qual as taxas de rede são enviadas periodicamente.
+
+### Exemplo de Uso
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/GomdimApps/lcme"
+)
+
+func main() {
+	ratesChannel := lcme.MonitorNetworkRates()
+
+	for rate := range ratesChannel {
+
+		fmt.Printf("Download: %d KB, Upload: %d KB\n", rate.Download, rate.Upload)
+
+	}
+}
+```
 

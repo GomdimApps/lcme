@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/GomdimApps/lcme/system"
 	"github.com/GomdimApps/lcme/utils"
@@ -90,4 +91,24 @@ func GetFileInfo(dir string, files ...string) ([]system.FileInfo, error) {
 		})
 	}
 	return fileInfos, nil
+}
+
+// MonitorNetworkRates continuously calculates and returns the download and upload rates.
+func MonitorNetworkRates() chan system.NetworkInfo {
+	ratesChan := make(chan system.NetworkInfo)
+	go func() {
+		for {
+			downloadRate, uploadRate, err := utils.CalculateNetworkRates()
+			if err != nil {
+				fmt.Println("Error calculating network rates:", err)
+				continue
+			}
+			ratesChan <- system.NetworkInfo{
+				Download: downloadRate,
+				Upload:   uploadRate,
+			}
+			time.Sleep(1 * time.Second)
+		}
+	}()
+	return ratesChan
 }

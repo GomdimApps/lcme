@@ -279,6 +279,36 @@ func main() {
 
 ---
 
+### Tabela de Rede (NetworkRate)
+
+| Campo                       | Tipo        | Descrição                                                   |
+|-----------------------------|-------------|-------------------------------------------------------------|
+| `Network.Download`          | `int64`     |  Taxa de download em kilobytes por segundo (KBps)           |
+| `Network.Upload`            | `int64`     | Taxa de upload em kilobytes por segundo (KBps).             |
+
+
+### Exemplos de Uso (NetworkRate)
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/GomdimApps/lcme"
+)
+
+func main() {
+	serverInfo := lcme.GetInfoServer()
+
+	fmt.Printf("Download: %d KB\n", serverInfo.Network.Download)
+	fmt.Printf("Upload: %d KB\n", serverInfo.Network.Upload)
+
+}
+```
+
+---
+
 ### Tabela de Hardware
 
 | Campo                    | Tipo      | Descrição                           |
@@ -387,12 +417,18 @@ A função `GetFileInfo` é utilizada para obter informações detalhadas sobre 
 - **`dir`** (string): O caminho do diretório onde os arquivos estão localizados.
 - **`files`** (variadic string): Um ou mais nomes de arquivos para os quais as informações serão capturadas.
 
-#### Retornos
-A estrutura contém as seguintes informações sobre um arquivo:
-- **`FileName`**: O nome do arquivo.
-- **`FileSize`**: O tamanho do arquivo em bytes.
-- **`FileLastChange`**: A data e hora da última modificação do arquivo.
-- **`FileUserPermisson`**: As permissões do arquivo.
+### Tabela de FileInfo
+
+| Campo                | Tipo         | Descrição                                      |
+|----------------------|--------------|------------------------------------------------|
+| `FileName`           | `string`     | Nome do arquivo.                               |
+| `FileSize`           | `int64`      | Tamanho do arquivo em bytes.                   |
+| `FileLastChange`     | `time.Time`  | Data e hora da última modificação do arquivo.  |
+| `FileUserPermisson`  | `os.FileMode`| Permissões do usuário no arquivo.              |
+| `FileExtension`      | `string`     | Extensão do arquivo.                           |
+| `FileData`           | `string`     | Conteúdo do arquivo em formato de string.      |
+| `FileDataBuffer`     | `bytes.Buffer`| Buffer contendo os dados do arquivo.           |
+| `FileDir`            | `string`     | Diretório onde o arquivo está localizado.      |
 
 #### Exemplo de Uso
 
@@ -490,4 +526,29 @@ func main() {
     ```
     Cada chamada para `succerlog` adiciona uma nova linha ao arquivo `log.txt` com a mensagem fornecida.
 
+# MonitorNetworkRates
+
+A função `MonitorNetworkRates` é utilizada para monitorar continuamente as taxas de download e upload da interface de rede ativa. Ela retorna um canal através do qual as taxas de rede são enviadas periodicamente.
+
+### Exemplo de Uso
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/GomdimApps/lcme"
+)
+
+func main() {
+	ratesChannel := lcme.MonitorNetworkRates()
+
+	for rate := range ratesChannel {
+
+		fmt.Printf("Download: %d KB, Upload: %d KB\n", rate.Download, rate.Upload)
+
+	}
+}
+```
 

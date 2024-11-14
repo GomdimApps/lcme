@@ -1,6 +1,7 @@
 package lcme
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -82,12 +83,58 @@ func GetFileInfo(dir string, files ...string) ([]system.FileInfo, error) {
 		} else if err != nil {
 			return nil, fmt.Errorf("error capturing file information: %v", err)
 		}
+		extension := strings.TrimPrefix(filepath.Ext(file), ".")
+		if extension == "" {
+			extension = ""
+		}
+		fileData, err := os.ReadFile(filePath)
+		if err != nil {
+			return nil, fmt.Errorf("error reading file data: %v", err)
+		}
+		var buffer bytes.Buffer
+		buffer.Write(fileData)
 		fileInfos = append(fileInfos, system.FileInfo{
 			FileName:          info.Name(),
 			FileSize:          info.Size() / 1024,
 			FileLastChange:    info.ModTime(),
 			FileUserPermisson: info.Mode(),
+			FileExtension:     extension,
+			FileData:          string(fileData),
+			FileDataBuffer:    buffer,
+			FileDir:           dir,
 		})
 	}
 	return fileInfos, nil
+}
+
+// MonitorNetworkRates continuously calculates and returns the download and upload rates.
+func MonitorNetworkRates() chan system.NetworkInfo {
+	ratesChan := make(chan system.NetworkInfo)
+	go func() {
+		for {
+			initialStats, err := utils.GetNetworkStats()
+			if err != nil {
+				fmt.Println("Error getting initial network stats:", err)
+				continue
+			}
+
+			interfaceName, err := utils.GetActiveInterface(initialStats)
+			if err != nil {
+				fmt.Println("Error getting active interface:", err)
+				continue
+			}
+
+			downloadRate, uploadRate, err := utils.CalculateNetworkRates(initialStats, interfaceName)
+			if err != nil {
+				fmt.Println("Error calculating network rates:", err)
+				continue
+			}
+
+			ratesChan <- system.NetworkInfo{
+				Download: downloadRate,
+				Upload:   uploadRate,
+			}
+		}
+	}()
+	return ratesChan
 }

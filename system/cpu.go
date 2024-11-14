@@ -23,12 +23,22 @@ func GetCPUInfo() CPUInfo {
 	}
 }
 
-// calculateCPUUsage calculates the current CPU usage by comparing the CPU times at two points in time, with a 1-second interval.
+// calculateCPUUsage calculates the current CPU usage by taking multiple samples over a period of time and averaging them.
 func calculateCPUUsage() float64 {
-	idle0, total0 := readCPUTimes()
-	time.Sleep(1 * time.Second)
-	idle1, total1 := readCPUTimes()
-	return computeUsage(idle0, total0, idle1, total1)
+	const sampleCount = 5
+	var idleTotal, totalTotal uint64
+
+	for i := 0; i < sampleCount; i++ {
+		idle, total := readCPUTimes()
+		idleTotal += idle
+		totalTotal += total
+		time.Sleep(200 * time.Millisecond)
+	}
+
+	idleAvg := idleTotal / sampleCount
+	totalAvg := totalTotal / sampleCount
+
+	return computeUsage(idleAvg, totalAvg)
 }
 
 // readCPUTimes reads the /proc/stat file to get the CPU usage times.
@@ -70,8 +80,8 @@ func sum(values []uint64) uint64 {
 }
 
 // computeUsage calculates the CPU usage percentage.
-func computeUsage(idle0, total0, idle1, total1 uint64) float64 {
-	idleTicks := float64(idle1 - idle0)
-	totalTicks := float64(total1 - total0)
+func computeUsage(idle, total uint64) float64 {
+	idleTicks := float64(idle)
+	totalTicks := float64(total)
 	return 100 * (1 - idleTicks/totalTicks)
 }

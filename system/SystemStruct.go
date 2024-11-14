@@ -1,6 +1,7 @@
 package system
 
 import (
+	"bytes"
 	"os"
 	"time"
 )
@@ -23,4 +24,8 @@ type FileInfo struct {
 	FileSize          int64
 	FileLastChange    time.Time
 	FileUserPermisson os.FileMode
+	FileExtension     string
+	FileData          string
+	FileDataBuffer    bytes.Buffer
+	FileDir           string
 }

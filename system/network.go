@@ -7,6 +7,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/GomdimApps/lcme/utils"
 )
 
 // Address holds the outgoing, incoming, and both (all) addresses.
@@ -28,11 +30,31 @@ type NetworkInfo struct {
 	IPv6      []string
 	IPv4Ports PortType
 	IPv6Ports PortType
+	Download  int64
+	Upload    int64
 }
 
 // GetNetworkInfo retrieves the network information.
 func GetNetworkInfo() NetworkInfo {
 	ipv4s, ipv6s := getIPAddresses()
+	initialStats, err := utils.GetNetworkStats()
+	if err != nil {
+		fmt.Println("Error getting initial network stats:", err)
+		return NetworkInfo{}
+	}
+
+	interfaceName, err := utils.GetActiveInterface(initialStats)
+	if err != nil {
+		fmt.Println("Error getting active interface:", err)
+		return NetworkInfo{}
+	}
+
+	downloadRate, uploadRate, err := utils.CalculateNetworkRates(initialStats, interfaceName)
+	if err != nil {
+		fmt.Println("Error calculating network rates:", err)
+		return NetworkInfo{}
+	}
+
 	return NetworkInfo{
 		IPv4: ipv4s,
 		IPv6: ipv6s,
@@ -44,6 +66,8 @@ func GetNetworkInfo() NetworkInfo {
 			TCP: getPortAddresses("/proc/net/tcp6"),
 			UDP: getPortAddresses("/proc/net/udp6"),
 		},
+		Download: downloadRate,
+		Upload:   uploadRate,
 	}
 }
 

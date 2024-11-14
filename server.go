@@ -1,6 +1,7 @@
 package lcme
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -87,12 +88,20 @@ func GetFileInfo(dir string, files ...string) ([]system.FileInfo, error) {
 		if extension == "" {
 			extension = ""
 		}
+		fileData, err := os.ReadFile(filePath)
+		if err != nil {
+			return nil, fmt.Errorf("error reading file data: %v", err)
+		}
+		var buffer bytes.Buffer
+		buffer.Write(fileData)
 		fileInfos = append(fileInfos, system.FileInfo{
 			FileName:          info.Name(),
 			FileSize:          info.Size() / 1024,
 			FileLastChange:    info.ModTime(),
 			FileUserPermisson: info.Mode(),
 			FileExtension:     extension,
+			FileData:          string(fileData),
+			FileDataBuffer:    buffer,
 		})
 	}
 	return fileInfos, nil

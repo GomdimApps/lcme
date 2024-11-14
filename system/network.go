@@ -37,10 +37,24 @@ type NetworkInfo struct {
 // GetNetworkInfo retrieves the network information.
 func GetNetworkInfo() NetworkInfo {
 	ipv4s, ipv6s := getIPAddresses()
-	downloadRate, uploadRate, err := utils.CalculateNetworkRates()
+	initialStats, err := utils.GetNetworkStats()
+	if err != nil {
+		fmt.Println("Error getting initial network stats:", err)
+		return NetworkInfo{}
+	}
+
+	interfaceName, err := utils.GetActiveInterface(initialStats)
+	if err != nil {
+		fmt.Println("Error getting active interface:", err)
+		return NetworkInfo{}
+	}
+
+	downloadRate, uploadRate, err := utils.CalculateNetworkRates(initialStats, interfaceName)
 	if err != nil {
 		fmt.Println("Error calculating network rates:", err)
+		return NetworkInfo{}
 	}
+
 	return NetworkInfo{
 		IPv4: ipv4s,
 		IPv6: ipv6s,

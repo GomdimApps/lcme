@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/GomdimApps/lcme/system"
 	"github.com/GomdimApps/lcme/utils"
@@ -102,6 +101,7 @@ func GetFileInfo(dir string, files ...string) ([]system.FileInfo, error) {
 			FileExtension:     extension,
 			FileData:          string(fileData),
 			FileDataBuffer:    buffer,
+			FileDir:           dir,
 		})
 	}
 	return fileInfos, nil
@@ -112,16 +112,28 @@ func MonitorNetworkRates() chan system.NetworkInfo {
 	ratesChan := make(chan system.NetworkInfo)
 	go func() {
 		for {
-			downloadRate, uploadRate, err := utils.CalculateNetworkRates()
+			initialStats, err := utils.GetNetworkStats()
+			if err != nil {
+				fmt.Println("Error getting initial network stats:", err)
+				continue
+			}
+
+			interfaceName, err := utils.GetActiveInterface(initialStats)
+			if err != nil {
+				fmt.Println("Error getting active interface:", err)
+				continue
+			}
+
+			downloadRate, uploadRate, err := utils.CalculateNetworkRates(initialStats, interfaceName)
 			if err != nil {
 				fmt.Println("Error calculating network rates:", err)
 				continue
 			}
+
 			ratesChan <- system.NetworkInfo{
 				Download: downloadRate,
 				Upload:   uploadRate,
 			}
-			time.Sleep(1 * time.Second)
 		}
 	}()
 	return ratesChan

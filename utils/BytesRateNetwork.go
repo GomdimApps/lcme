@@ -63,17 +63,7 @@ func GetActiveInterface(stats map[string][2]int64) (string, error) {
 }
 
 // CalculateNetworkRates calculates the download and upload rates for the active network interface.
-func CalculateNetworkRates() (downloadRate, uploadRate int64, err error) {
-	initialStats, err := GetNetworkStats()
-	if err != nil {
-		return 0, 0, err
-	}
-
-	interfaceName, err := GetActiveInterface(initialStats)
-	if err != nil {
-		return 0, 0, err
-	}
-
+func CalculateNetworkRates(initialStats map[string][2]int64, interfaceName string) (downloadRate, uploadRate int64, err error) {
 	initialBytes := initialStats[interfaceName]
 
 	time.Sleep(1 * time.Second)

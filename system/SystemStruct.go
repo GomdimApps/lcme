@@ -27,4 +27,5 @@ type FileInfo struct {
 	FileExtension     string
 	FileData          string
 	FileDataBuffer    bytes.Buffer
+	FileDir           string
 }

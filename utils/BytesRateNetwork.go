@@ -9,25 +9,22 @@ import (
 	"time"
 )
 
-// GetActiveInterface returns the name of the active network interface.
-func GetActiveInterface() (string, error) {
+// GetNetworkStats reads the network statistics from /proc/net/dev and returns a map of interface names to their received and transmitted bytes.
+func GetNetworkStats() (map[string][2]int64, error) {
 	file, err := os.Open("/proc/net/dev")
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer file.Close()
 
+	stats := make(map[string][2]int64)
 	scanner := bufio.NewScanner(file)
 	scanner.Scan() // Skip the first header line
 	scanner.Scan() // Skip the second header line
 
-	maxBytes := int64(0)
-	activeInterface := ""
-
 	for scanner.Scan() {
 		line := scanner.Text()
 		fields := strings.Fields(line)
-
 		if len(fields) < 10 {
 			continue
 		}
@@ -35,11 +32,26 @@ func GetActiveInterface() (string, error) {
 		iface := strings.TrimSuffix(fields[0], ":")
 		rxBytes, err := strconv.ParseInt(fields[1], 10, 64)
 		if err != nil {
-			return "", err
+			return nil, err
+		}
+		txBytes, err := strconv.ParseInt(fields[9], 10, 64)
+		if err != nil {
+			return nil, err
 		}
 
-		if rxBytes > maxBytes {
-			maxBytes = rxBytes
+		stats[iface] = [2]int64{rxBytes, txBytes}
+	}
+
+	return stats, nil
+}
+
+// GetActiveInterface returns the name of the active network interface.
+func GetActiveInterface(stats map[string][2]int64) (string, error) {
+	maxBytes := int64(0)
+	activeInterface := ""
+	for iface, bytes := range stats {
+		if bytes[0] > maxBytes {
+			maxBytes = bytes[0]
 			activeInterface = iface
 		}
 	}
@@ -50,57 +62,31 @@ func GetActiveInterface() (string, error) {
 	return activeInterface, nil
 }
 
-// GetBytes returns the received and transmitted bytes for a given network interface.
-func GetBytes(interfaceName string) (rxBytes, txBytes int64, err error) {
-	file, err := os.Open("/proc/net/dev")
-	if err != nil {
-		return 0, 0, err
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		line := scanner.Text()
-		if strings.Contains(line, interfaceName) {
-			fields := strings.Fields(line)
-			if len(fields) < 10 {
-				return 0, 0, fmt.Errorf("unexpected format in /proc/net/dev")
-			}
-			rxBytes, err = strconv.ParseInt(fields[1], 10, 64)
-			if err != nil {
-				return 0, 0, err
-			}
-			txBytes, err = strconv.ParseInt(fields[9], 10, 64)
-			if err != nil {
-				return 0, 0, err
-			}
-			return rxBytes, txBytes, nil
-		}
-	}
-	return 0, 0, fmt.Errorf("interface %s not found", interfaceName)
-}
-
 // CalculateNetworkRates calculates the download and upload rates for the active network interface.
 func CalculateNetworkRates() (downloadRate, uploadRate int64, err error) {
-	interfaceName, err := GetActiveInterface()
+	initialStats, err := GetNetworkStats()
 	if err != nil {
 		return 0, 0, err
 	}
 
-	rxBytesInitial, txBytesInitial, err := GetBytes(interfaceName)
+	interfaceName, err := GetActiveInterface(initialStats)
 	if err != nil {
 		return 0, 0, err
 	}
+
+	initialBytes := initialStats[interfaceName]
 
 	time.Sleep(1 * time.Second)
 
-	rxBytesFinal, txBytesFinal, err := GetBytes(interfaceName)
+	finalStats, err := GetNetworkStats()
 	if err != nil {
 		return 0, 0, err
 	}
 
-	downloadRate = (rxBytesFinal - rxBytesInitial) / 1024 // Calculate in KBps
-	uploadRate = (txBytesFinal - txBytesInitial) / 1024   // Calculate in KBps
+	finalBytes := finalStats[interfaceName]
+
+	downloadRate = (finalBytes[0] - initialBytes[0]) / 1024 // Calculate in KBps
+	uploadRate = (finalBytes[1] - initialBytes[1]) / 1024   // Calculate in KBps
 
 	return downloadRate, uploadRate, nil
 }

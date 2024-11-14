@@ -417,12 +417,18 @@ A função `GetFileInfo` é utilizada para obter informações detalhadas sobre 
 - **`dir`** (string): O caminho do diretório onde os arquivos estão localizados.
 - **`files`** (variadic string): Um ou mais nomes de arquivos para os quais as informações serão capturadas.
 
-#### Retornos
-A estrutura contém as seguintes informações sobre um arquivo:
-- **`FileName`**: O nome do arquivo.
-- **`FileSize`**: O tamanho do arquivo em bytes.
-- **`FileLastChange`**: A data e hora da última modificação do arquivo.
-- **`FileUserPermisson`**: As permissões do arquivo.
+### Tabela de FileInfo
+
+| Campo                | Tipo         | Descrição                                      |
+|----------------------|--------------|------------------------------------------------|
+| `FileName`           | `string`     | Nome do arquivo.                               |
+| `FileSize`           | `int64`      | Tamanho do arquivo em bytes.                   |
+| `FileLastChange`     | `time.Time`  | Data e hora da última modificação do arquivo.  |
+| `FileUserPermisson`  | `os.FileMode`| Permissões do usuário no arquivo.              |
+| `FileExtension`      | `string`     | Extensão do arquivo.                           |
+| `FileData`           | `string`     | Conteúdo do arquivo em formato de string.      |
+| `FileDataBuffer`     | `bytes.Buffer`| Buffer contendo os dados do arquivo.           |
+| `FileDir`            | `string`     | Diretório onde o arquivo está localizado.      |
 
 #### Exemplo de Uso
 

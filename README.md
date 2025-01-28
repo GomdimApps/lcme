@@ -575,7 +575,6 @@ func main() {
 	// Define a task function
 	task := func(ctx context.Context) error {
 		// Simulate a long-running operation
-		time.Sleep(3 * time.Second)
 		fmt.Println("Task completed")
 		return nil
 	}

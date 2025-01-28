@@ -19,7 +19,7 @@ type Engine struct {
 }
 
 func NewEngine() *Engine {
-	// Configuração do logger via log padrão
+	// Logger configuration using standard log
 	logger := log.New(log.Writer(), "EngineLogger: ", log.LstdFlags)
 
 	return &Engine{
@@ -45,7 +45,7 @@ func (e *Engine) worker() {
 			defer cancel()
 			err := task(ctx)
 			if err != nil {
-				e.logger.Println("Erro ao processar tarefa:", err)
+				e.logger.Println("Error processing task:", err)
 			}
 		}()
 	}
@@ -68,18 +68,30 @@ func (e *Engine) scaleWorkers() {
 		go e.worker()
 	}
 	e.workers += 5
-	e.logger.Println("Escalonado trabalhadores para:", e.workers)
+	e.logger.Println("Scaled workers to:", e.workers)
 }
 
+// ForkProcess creates a new process by duplicating the memory of an existing process.
+// It locks the engine to ensure thread safety, increments the worker count, and performs
+// a copy-on-write operation to duplicate the memory of the original process.
+// The function logs the forking action and returns the new process ID.
+//
+// Parameters:
+//
+//	id - The ID of the process to be forked.
+//
+// Returns:
+//
+//	The ID of the newly created process.
 func (e *Engine) ForkProcess(id int) int {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	newID := e.workers + 1
-	// Implementar Copy on Write
+	// Implement Copy on Write
 	if originalMem, ok := e.mem[id]; ok {
 		e.mem[newID] = append([]byte{}, originalMem...)
 	}
-	e.logger.Println("Processo bifurcado", id, "para", newID)
+	e.logger.Println("Forked process", id, "to", newID)
 	return newID
 }
 
@@ -87,7 +99,7 @@ func (e *Engine) WriteProcessMem(id int, data []byte) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	if _, ok := e.mem[id]; ok {
-		// Alocar nova memória para o processo se necessário
+		// Allocate new memory for the process if necessary
 		e.mem[id] = append([]byte{}, data...)
 	} else {
 		e.mem[id] = data

@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/GomdimApps/lcme/threads"
+
 	"github.com/GomdimApps/lcme/system"
 	"github.com/GomdimApps/lcme/utils"
 )
@@ -137,4 +139,12 @@ func MonitorNetworkRates() chan system.NetworkInfo {
 		}
 	}()
 	return ratesChan
+}
+
+// ExecuteTask accepts a task function and manages its execution using the Engine.
+func ScaleFork(task threads.Task) {
+	engine := threads.NewEngine()
+	engine.Start()
+	engine.AddTask(task)
+	engine.Stop()
 }

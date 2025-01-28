@@ -552,3 +552,56 @@ func main() {
 }
 ```
 
+---
+
+# ScaleFork
+
+A função `ScaleFork` é capaz de escalar a execução de uma tarefa, gerenciando sua execução.
+
+### Exemplo de Uso
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/GomdimApps/lcme"
+)
+
+func main() {
+	// Define a task function
+	task := func(ctx context.Context) error {
+		// Simulate a long-running operation
+		time.Sleep(3 * time.Second)
+		fmt.Println("Task completed")
+		return nil
+	}
+
+	// Execute the task using the ExecuteTask function
+	lcme.ScaleFork(task)
+}
+```
+
+### Benefícios
+
+Esta função oferece uma série de benefícios, especialmente para quem busca gerenciar e escalar o processamento de tarefas assíncronas. Aqui estão alguns dos principais benefícios:
+
+1. **Escalabilidade:**
+	- A função permite escalar dinamicamente o número de trabalhadores (workers) conforme a demanda de tarefas. Isso garante que o sistema possa lidar com picos de carga sem interrupções.
+
+2. **Gerenciamento Eficiente de Tarefas:**
+	- Usando goroutines, a função consegue executar várias tarefas em paralelo, o que aumenta a eficiência e a velocidade do processamento.
+
+3. **Isolamento de Processos:**
+	- A funcionalidade de bifurcação de processos (`ForkProcess`) e manipulação de memória (`WriteProcessMem`) permite criar cópias de processos e modificar dados de maneira controlada, o que é útil para testes e simulações.
+
+### Exemplos de Uso
+
+- **Processamento em Lote:** Ideal para sistemas que precisam processar grandes volumes de dados em lote, como sistemas de processamento de imagens ou análises de dados.
+- **Sistema de Filas:** Pode ser usado como base para um sistema de filas onde diferentes tarefas precisam ser enfileiradas e executadas de forma assíncrona.
+- **Aplicações Web:** Pode servir como um backend para aplicações web que necessitam de processamento em segundo plano, como envio de e-mails, notificações push, etc.
+```
+

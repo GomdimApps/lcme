@@ -141,7 +141,7 @@ func MonitorNetworkRates() chan system.NetworkInfo {
 	return ratesChan
 }
 
-// ExecuteTask accepts a task function and manages its execution using the Engine.
+// ScaleFork accepts a task function and manages its execution using the Engine.
 func ScaleFork(task threads.Task) {
 	engine := threads.NewEngine()
 	engine.Start()

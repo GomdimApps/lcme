@@ -1,13 +1,11 @@
 package threads
 
 import (
-	"context"
 	"log"
 	"sync"
-	"time"
 )
 
-type Task func(ctx context.Context) error
+type Task func()
 
 type Engine struct {
 	workers int
@@ -41,12 +39,7 @@ func (e *Engine) worker() {
 	defer e.wg.Done()
 	for task := range e.tasks {
 		func() {
-			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-			defer cancel()
-			err := task(ctx)
-			if err != nil {
-				e.logger.Println("Error processing task:", err)
-			}
+			task()
 		}()
 	}
 }

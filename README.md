@@ -564,23 +564,18 @@ A função `ScaleFork` é capaz de escalar a execução de uma tarefa, gerencian
 package main
 
 import (
-	"context"
 	"fmt"
-	"time"
 
 	"github.com/GomdimApps/lcme"
+	// Ensure the threads package is imported
 )
 
 func main() {
-	// Define a task function
-	task := func(ctx context.Context) error {
+	// Execute the task using the ScaleFork function
+	lcme.ScaleFork(func() {
 		// Simulate a long-running operation
 		fmt.Println("Task completed")
-		return nil
-	}
-
-	// Execute the task using the ExecuteTask function
-	lcme.ScaleFork(task)
+	})
 }
 ```
 

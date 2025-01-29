@@ -4,6 +4,7 @@ import (
 	"log"
 	"runtime"
 	"sync"
+	"time"
 )
 
 type Task func()
@@ -34,13 +35,18 @@ func (e *Engine) Start() {
 		e.wg.Add(1)
 		go e.worker()
 	}
+	go e.Monitor()       // Start the monitor to dynamically adjust workers
+	go e.AdjustWorkers() // Start the adjuster to dynamically adjust workers based on task execution time
 }
 
 func (e *Engine) worker() {
 	defer e.wg.Done()
 	for task := range e.tasks {
 		func() {
+			start := time.Now()
 			task()
+			duration := time.Since(start)
+			e.logger.Println("Task completed in:", duration)
 		}()
 	}
 }
@@ -104,4 +110,52 @@ func (e *Engine) WriteProcessMem(id int, data []byte) {
 func (e *Engine) Stop() {
 	close(e.tasks)
 	e.wg.Wait()
+}
+
+// Monitor dynamically adjusts the number of workers based on the load.
+func (e *Engine) Monitor() {
+	ticker := time.NewTicker(400 * time.Millisecond) // Alterado para 400 milissegundos
+	defer ticker.Stop()
+	for range ticker.C {
+		e.mu.Lock()
+		queueLength := len(e.tasks)
+		e.mu.Unlock()
+		if queueLength > cap(e.tasks)/2 {
+			e.scaleWorkers()
+		}
+	}
+}
+
+// AdjustWorkers dynamically adjusts the number of workers based on task execution time.
+func (e *Engine) AdjustWorkers() {
+	ticker := time.NewTicker(400 * time.Millisecond) // Alterado para 400 milissegundos
+	defer ticker.Stop()
+	for range ticker.C {
+		e.mu.Lock()
+		totalTasks := len(e.tasks)
+		e.mu.Unlock()
+		if totalTasks > 0 {
+			avgTaskTime := e.calculateAverageTaskTime()
+			if avgTaskTime > 100*time.Millisecond {
+				e.scaleWorkers()
+			}
+		}
+	}
+}
+
+// calculateAverageTaskTime calculates the average execution time of tasks.
+func (e *Engine) calculateAverageTaskTime() time.Duration {
+	var totalDuration time.Duration
+	var taskCount int
+	for task := range e.tasks {
+		start := time.Now()
+		task()
+		duration := time.Since(start)
+		totalDuration += duration
+		taskCount++
+	}
+	if taskCount == 0 {
+		return 0
+	}
+	return totalDuration / time.Duration(taskCount)
 }

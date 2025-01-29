@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/GomdimApps/lcme/threads"
+	"github.com/GomdimApps/lcme/system/threads"
 
 	"github.com/GomdimApps/lcme/system"
-	"github.com/GomdimApps/lcme/utils"
+	"github.com/GomdimApps/lcme/system/utils"
 )
 
 // GetInfoServer collects detailed information about the server, including

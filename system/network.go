@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/GomdimApps/lcme/utils"
+	"github.com/GomdimApps/lcme/system/utils"
 )
 
 // Address holds the outgoing, incoming, and both (all) addresses.

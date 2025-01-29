@@ -3,7 +3,7 @@ package system
 import (
 	"fmt"
 
-	"github.com/GomdimApps/lcme/utils"
+	"github.com/GomdimApps/lcme/system/utils"
 )
 
 // HardwareInfo is a structure that contains information about the server's hardware,

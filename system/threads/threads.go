@@ -90,7 +90,7 @@ func (e *Engine) ForkProcess(id int) int {
 	newID := e.workers + 1
 	// Implement Copy on Write
 	if originalMem, ok := e.mem[id]; ok {
-		e.mem[newID] = append([]byte{}, originalMem...)
+		e.mem[newID] = append(e.mem[newID][:0], originalMem...)
 	}
 	e.logger.Println("Forked process", id, "to", newID)
 	return newID
@@ -101,7 +101,7 @@ func (e *Engine) WriteProcessMem(id int, data []byte) {
 	defer e.mu.Unlock()
 	if _, ok := e.mem[id]; ok {
 		// Allocate new memory for the process if necessary
-		e.mem[id] = append([]byte{}, data...)
+		e.mem[id] = append(e.mem[id][:0], data...)
 	} else {
 		e.mem[id] = data
 	}

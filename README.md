@@ -589,9 +589,6 @@ Esta função oferece uma série de benefícios, especialmente para quem busca g
 2. **Gerenciamento Eficiente de Tarefas:**
 	- Usando goroutines, a função consegue executar várias tarefas em paralelo, o que aumenta a eficiência e a velocidade do processamento.
 
-3. **Isolamento de Processos:**
-	- A funcionalidade de bifurcação de processos (`ForkProcess`) e manipulação de memória (`WriteProcessMem`) permite criar cópias de processos e modificar dados de maneira controlada, o que é útil para testes e simulações.
-
 ### Exemplos de Uso
 
 - **Processamento em Lote:** Ideal para sistemas que precisam processar grandes volumes de dados em lote, como sistemas de processamento de imagens ou análises de dados.

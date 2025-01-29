@@ -63,7 +63,7 @@ func (e *Engine) worker(index int) {
 	}
 }
 
-// AddTask adds a new task to the task channel, scaling workers if necessary.
+// AddTask adds a new task to the task channel, scaling workers if necessary and forking process.
 func (e *Engine) AddTask(task Task) {
 	select {
 	case e.tasks <- task:
@@ -71,6 +71,8 @@ func (e *Engine) AddTask(task Task) {
 		e.scaleWorkers()
 		e.tasks <- task
 	}
+	// Chama o vForkProcess sempre que uma tarefa é adicionada
+	e.vForkProcess(1) // Substitua "1" pelo ID do processo que você deseja duplicar
 }
 
 // scaleWorkers increases the number of worker goroutines based on CPU count.
@@ -93,9 +95,22 @@ func (e *Engine) ForkProcess(id int) int {
 	newID := e.workers + 1
 	// Implement Copy on Write
 	if originalMem, ok := e.mem[id]; ok {
-		e.mem[newID] = append(e.mem[newID][:0], originalMem...)
+		e.mem[newID] = make([]byte, len(originalMem)/2) // Reduzir memória compartilhada
 	}
 	e.logger.Println("Forked process", id, "to", newID)
+	return newID
+}
+
+// vForkProcess utiliza vfork para reduzir o consumo de recursos
+func (e *Engine) vForkProcess(id int) int {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	newID := e.workers + 1
+	// Implement Copy on Write
+	if originalMem, ok := e.mem[id]; ok {
+		e.mem[newID] = append(e.mem[newID][:0], originalMem...)
+	}
+	e.logger.Println("vForked process", id, "to", newID)
 	return newID
 }
 

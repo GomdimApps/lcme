@@ -4,6 +4,7 @@ import (
 	"log"
 	"runtime"
 	"sync"
+	"time"
 
 	"golang.org/x/sys/unix"
 )
@@ -20,6 +21,7 @@ type Engine struct {
 	mem        map[int][]byte // Memory map for process management
 	logger     *log.Logger    // Logger for logging engine activities
 	maxWorkers int            // Maximum number of workers
+	pool       sync.Pool      // Pool for reusable task objects
 }
 
 // NewEngine initializes a new Engine with a logger and a starting number of workers.
@@ -38,6 +40,11 @@ func NewEngine(maxWorkers int) *Engine {
 		mem:        make(map[int][]byte),
 		logger:     logger,
 		maxWorkers: maxWorkers,
+		pool: sync.Pool{
+			New: func() interface{} {
+				return new(Task)
+			},
+		},
 	}
 }
 
@@ -47,6 +54,7 @@ func (e *Engine) Start() {
 		e.wg.Add(1)
 		go e.worker(i)
 	}
+	go e.monitorLoad()
 }
 
 // worker executes tasks from the task channel and sets CPU affinity.
@@ -85,6 +93,17 @@ func (e *Engine) scaleWorkers() {
 		}
 		e.workers += additionalWorkers
 		e.logger.Println("Scaled workers to:", e.workers)
+	}
+}
+
+// monitorLoad adjusts the number of goroutines based on the current load.
+func (e *Engine) monitorLoad() {
+	ticker := time.NewTicker(400 * time.Millisecond)
+	defer ticker.Stop()
+	for range ticker.C {
+		if len(e.tasks) > cap(e.tasks)/2 {
+			e.scaleWorkers()
+		}
 	}
 }
 

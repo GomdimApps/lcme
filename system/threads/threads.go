@@ -4,25 +4,27 @@ import (
 	"log"
 	"runtime"
 	"sync"
-	"time"
 
 	"golang.org/x/sys/unix"
 )
 
+// Task represents a unit of work to be executed by the engine.
 type Task func()
 
+// Engine manages a pool of workers to execute tasks concurrently.
 type Engine struct {
-	workers int
-	tasks   chan Task
-	wg      sync.WaitGroup
-	mu      sync.Mutex
-	mem     map[int][]byte
-	logger  *log.Logger
+	workers int            // Number of worker goroutines
+	tasks   chan Task      // Channel to queue tasks
+	wg      sync.WaitGroup // WaitGroup to manage worker goroutines
+	mu      sync.Mutex     // Mutex to protect shared resources
+	mem     map[int][]byte // Memory map for process management
+	logger  *log.Logger    // Logger for logging engine activities
 }
 
+// NewEngine initializes a new Engine with a logger and a starting number of workers.
 func NewEngine() *Engine {
 	// Logger configuration using standard log
-	logger := log.New(log.Writer(), "EngineLogger: ", log.LstdFlags)
+	logger := log.New(log.Writer(), "Engine: ", log.LstdFlags)
 
 	// Start with 2% of CPU usage
 	initialWorkers := int(float64(runtime.NumCPU()) * 0.06)
@@ -38,15 +40,15 @@ func NewEngine() *Engine {
 	}
 }
 
+// Start launches the initial set of worker goroutines.
 func (e *Engine) Start() {
 	for i := 0; i < e.workers; i++ {
 		e.wg.Add(1)
 		go e.worker()
 	}
-	go e.Monitor()       // Start the monitor to dynamically adjust workers
-	go e.AdjustWorkers() // Start the adjuster to dynamically adjust workers based on task execution time
 }
 
+// worker executes tasks from the task channel and sets CPU affinity.
 func (e *Engine) worker() {
 	defer e.wg.Done()
 	// Set CPU affinity for this worker
@@ -57,15 +59,11 @@ func (e *Engine) worker() {
 	unix.SchedSetaffinity(0, &cpuSet)
 
 	for task := range e.tasks {
-		func() {
-			start := time.Now()
-			task()
-			duration := time.Since(start)
-			e.logger.Println("Task completed in:", duration)
-		}()
+		task()
 	}
 }
 
+// AddTask adds a new task to the task channel, scaling workers if necessary.
 func (e *Engine) AddTask(task Task) {
 	select {
 	case e.tasks <- task:
@@ -75,6 +73,7 @@ func (e *Engine) AddTask(task Task) {
 	}
 }
 
+// scaleWorkers increases the number of worker goroutines based on CPU count.
 func (e *Engine) scaleWorkers() {
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -88,17 +87,6 @@ func (e *Engine) scaleWorkers() {
 }
 
 // ForkProcess creates a new process by duplicating the memory of an existing process.
-// It locks the engine to ensure thread safety, increments the worker count, and performs
-// a copy-on-write operation to duplicate the memory of the original process.
-// The function logs the forking action and returns the new process ID.
-//
-// Parameters:
-//
-//	id - The ID of the process to be forked.
-//
-// Returns:
-//
-//	The ID of the newly created process.
 func (e *Engine) ForkProcess(id int) int {
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -111,6 +99,7 @@ func (e *Engine) ForkProcess(id int) int {
 	return newID
 }
 
+// WriteProcessMem writes data to the memory of a specified process.
 func (e *Engine) WriteProcessMem(id int, data []byte) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -122,55 +111,8 @@ func (e *Engine) WriteProcessMem(id int, data []byte) {
 	}
 }
 
+// Stop gracefully shuts down the engine by closing the task channel and waiting for all workers to finish.
 func (e *Engine) Stop() {
 	close(e.tasks)
 	e.wg.Wait()
-}
-
-// Monitor dynamically adjusts the number of workers based on the load.
-func (e *Engine) Monitor() {
-	ticker := time.NewTicker(400 * time.Millisecond) // Alterado para 400 milissegundos
-	defer ticker.Stop()
-	for range ticker.C {
-		e.mu.Lock()
-		queueLength := len(e.tasks)
-		e.mu.Unlock()
-		if queueLength > cap(e.tasks)/2 {
-			e.scaleWorkers()
-		}
-	}
-}
-
-// AdjustWorkers dynamically adjusts the number of workers based on task execution time.
-func (e *Engine) AdjustWorkers() {
-	ticker := time.NewTicker(400 * time.Millisecond) // Alterado para 400 milissegundos
-	defer ticker.Stop()
-	for range ticker.C {
-		e.mu.Lock()
-		totalTasks := len(e.tasks)
-		e.mu.Unlock()
-		if totalTasks > 0 {
-			avgTaskTime := e.calculateAverageTaskTime()
-			if avgTaskTime > 100*time.Millisecond {
-				e.scaleWorkers()
-			}
-		}
-	}
-}
-
-// calculateAverageTaskTime calculates the average execution time of tasks.
-func (e *Engine) calculateAverageTaskTime() time.Duration {
-	var totalDuration time.Duration
-	var taskCount int
-	for task := range e.tasks {
-		start := time.Now()
-		task()
-		duration := time.Since(start)
-		totalDuration += duration
-		taskCount++
-	}
-	if taskCount == 0 {
-		return 0
-	}
-	return totalDuration / time.Duration(taskCount)
 }

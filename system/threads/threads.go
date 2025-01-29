@@ -5,6 +5,8 @@ import (
 	"runtime"
 	"sync"
 	"time"
+
+	"golang.org/x/sys/unix"
 )
 
 type Task func()
@@ -22,8 +24,14 @@ func NewEngine() *Engine {
 	// Logger configuration using standard log
 	logger := log.New(log.Writer(), "EngineLogger: ", log.LstdFlags)
 
+	// Start with 2% of CPU usage
+	initialWorkers := int(float64(runtime.NumCPU()) * 0.06)
+	if initialWorkers < 1 {
+		initialWorkers = 1
+	}
+
 	return &Engine{
-		workers: runtime.NumCPU(),
+		workers: initialWorkers,
 		tasks:   make(chan Task, 1000),
 		mem:     make(map[int][]byte),
 		logger:  logger,
@@ -41,6 +49,13 @@ func (e *Engine) Start() {
 
 func (e *Engine) worker() {
 	defer e.wg.Done()
+	// Set CPU affinity for this worker
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+	cpuSet := unix.CPUSet{}
+	cpuSet.Set(0) // Set to use CPU 0, adjust as needed
+	unix.SchedSetaffinity(0, &cpuSet)
+
 	for task := range e.tasks {
 		func() {
 			start := time.Now()

@@ -2,6 +2,7 @@ package threads
 
 import (
 	"log"
+	"runtime"
 	"sync"
 )
 
@@ -21,7 +22,7 @@ func NewEngine() *Engine {
 	logger := log.New(log.Writer(), "EngineLogger: ", log.LstdFlags)
 
 	return &Engine{
-		workers: 10,
+		workers: runtime.NumCPU(),
 		tasks:   make(chan Task, 1000),
 		mem:     make(map[int][]byte),
 		logger:  logger,
@@ -56,11 +57,12 @@ func (e *Engine) AddTask(task Task) {
 func (e *Engine) scaleWorkers() {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	for i := 0; i < 5; i++ {
+	additionalWorkers := runtime.NumCPU() / 2
+	for i := 0; i < additionalWorkers; i++ {
 		e.wg.Add(1)
 		go e.worker()
 	}
-	e.workers += 5
+	e.workers += additionalWorkers
 	e.logger.Println("Scaled workers to:", e.workers)
 }
 

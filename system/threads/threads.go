@@ -13,30 +13,31 @@ type Task func()
 
 // Engine manages a pool of workers to execute tasks concurrently.
 type Engine struct {
-	workers int            // Number of worker goroutines
-	tasks   chan Task      // Channel to queue tasks
-	wg      sync.WaitGroup // WaitGroup to manage worker goroutines
-	mu      sync.RWMutex   // RWMutex to protect shared resources
-	mem     map[int][]byte // Memory map for process management
-	logger  *log.Logger    // Logger for logging engine activities
+	workers    int            // Number of worker goroutines
+	tasks      chan Task      // Channel to queue tasks
+	wg         sync.WaitGroup // WaitGroup to manage worker goroutines
+	mu         sync.RWMutex   // RWMutex to protect shared resources
+	mem        map[int][]byte // Memory map for process management
+	logger     *log.Logger    // Logger for logging engine activities
+	maxWorkers int            // Maximum number of workers
 }
 
 // NewEngine initializes a new Engine with a logger and a starting number of workers.
-func NewEngine() *Engine {
+func NewEngine(maxWorkers int) *Engine {
 	// Logger configuration using standard log
 	logger := log.New(log.Writer(), "Engine: ", log.LstdFlags)
 
-	// Start with 2% of CPU usage
 	initialWorkers := int(float64(runtime.NumCPU()) * 0.06)
 	if initialWorkers < 1 {
 		initialWorkers = 1
 	}
 
 	return &Engine{
-		workers: initialWorkers,
-		tasks:   make(chan Task, 1000),
-		mem:     make(map[int][]byte),
-		logger:  logger,
+		workers:    initialWorkers,
+		tasks:      make(chan Task, 1000),
+		mem:        make(map[int][]byte),
+		logger:     logger,
+		maxWorkers: maxWorkers,
 	}
 }
 
@@ -51,11 +52,10 @@ func (e *Engine) Start() {
 // worker executes tasks from the task channel and sets CPU affinity.
 func (e *Engine) worker(index int) {
 	defer e.wg.Done()
-	// Set CPU affinity for this worker
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 	cpuSet := unix.CPUSet{}
-	cpuSet.Set((runtime.NumCPU() + index) % runtime.NumCPU()) // Distribute across CPUs
+	cpuSet.Set(index % runtime.NumCPU())
 	unix.SchedSetaffinity(0, &cpuSet)
 
 	for task := range e.tasks {
@@ -63,7 +63,7 @@ func (e *Engine) worker(index int) {
 	}
 }
 
-// AddTask adds a new task to the task channel, scaling workers if necessary and forking process.
+// AddTask adds a new task to the task channel, scaling workers if necessary.
 func (e *Engine) AddTask(task Task) {
 	select {
 	case e.tasks <- task:
@@ -71,58 +71,20 @@ func (e *Engine) AddTask(task Task) {
 		e.scaleWorkers()
 		e.tasks <- task
 	}
-	// Chama o vForkProcess sempre que uma tarefa é adicionada
-	e.vForkProcess(1) // Substitua "1" pelo ID do processo que você deseja duplicar
 }
 
 // scaleWorkers increases the number of worker goroutines based on CPU count.
 func (e *Engine) scaleWorkers() {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	additionalWorkers := runtime.NumCPU() / 2
-	for i := 0; i < additionalWorkers; i++ {
-		e.wg.Add(1)
-		go e.worker(i)
-	}
-	e.workers += additionalWorkers
-	e.logger.Println("Scaled workers to:", e.workers)
-}
-
-// ForkProcess creates a new process by duplicating the memory of an existing process.
-func (e *Engine) ForkProcess(id int) int {
-	e.mu.Lock()
-	defer e.mu.Unlock()
-	newID := e.workers + 1
-	// Implement Copy on Write
-	if originalMem, ok := e.mem[id]; ok {
-		e.mem[newID] = make([]byte, len(originalMem)/2) // Reduzir memória compartilhada
-	}
-	e.logger.Println("Forked process", id, "to", newID)
-	return newID
-}
-
-// vForkProcess utiliza vfork para reduzir o consumo de recursos
-func (e *Engine) vForkProcess(id int) int {
-	e.mu.Lock()
-	defer e.mu.Unlock()
-	newID := e.workers + 1
-	// Implement Copy on Write
-	if originalMem, ok := e.mem[id]; ok {
-		e.mem[newID] = append(e.mem[newID][:0], originalMem...)
-	}
-	e.logger.Println("vForked process", id, "to", newID)
-	return newID
-}
-
-// WriteProcessMem writes data to the memory of a specified process.
-func (e *Engine) WriteProcessMem(id int, data []byte) {
-	e.mu.Lock()
-	defer e.mu.Unlock()
-	if _, ok := e.mem[id]; ok {
-		// Allocate new memory for the process if necessary
-		e.mem[id] = append(e.mem[id][:0], data...)
-	} else {
-		e.mem[id] = data
+	if e.workers < e.maxWorkers {
+		additionalWorkers := (e.maxWorkers - e.workers) / 2
+		for i := 0; i < additionalWorkers; i++ {
+			e.wg.Add(1)
+			go e.worker(i)
+		}
+		e.workers += additionalWorkers
+		e.logger.Println("Scaled workers to:", e.workers)
 	}
 }
 

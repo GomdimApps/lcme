@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
-	"github.com/GomdimApps/lcme/system/threads"
-
 	"github.com/GomdimApps/lcme/system"
+	"github.com/GomdimApps/lcme/system/threads"
 	"github.com/GomdimApps/lcme/system/utils"
 )
 
@@ -143,7 +143,7 @@ func MonitorNetworkRates() chan system.NetworkInfo {
 
 // ScaleFork accepts a task function and manages its execution using the Engine.
 func ScaleFork(task threads.Task) {
-	engine := threads.NewEngine()
+	engine := threads.NewEngine(runtime.NumCPU())
 	engine.Start()
 	engine.AddTask(task)
 	engine.Stop()

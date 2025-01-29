@@ -16,7 +16,7 @@ type Engine struct {
 	workers int            // Number of worker goroutines
 	tasks   chan Task      // Channel to queue tasks
 	wg      sync.WaitGroup // WaitGroup to manage worker goroutines
-	mu      sync.Mutex     // Mutex to protect shared resources
+	mu      sync.RWMutex   // RWMutex to protect shared resources
 	mem     map[int][]byte // Memory map for process management
 	logger  *log.Logger    // Logger for logging engine activities
 }
@@ -44,18 +44,18 @@ func NewEngine() *Engine {
 func (e *Engine) Start() {
 	for i := 0; i < e.workers; i++ {
 		e.wg.Add(1)
-		go e.worker()
+		go e.worker(i)
 	}
 }
 
 // worker executes tasks from the task channel and sets CPU affinity.
-func (e *Engine) worker() {
+func (e *Engine) worker(index int) {
 	defer e.wg.Done()
 	// Set CPU affinity for this worker
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 	cpuSet := unix.CPUSet{}
-	cpuSet.Set(0) // Set to use CPU 0, adjust as needed
+	cpuSet.Set((runtime.NumCPU() + index) % runtime.NumCPU()) // Distribute across CPUs
 	unix.SchedSetaffinity(0, &cpuSet)
 
 	for task := range e.tasks {
@@ -80,7 +80,7 @@ func (e *Engine) scaleWorkers() {
 	additionalWorkers := runtime.NumCPU() / 2
 	for i := 0; i < additionalWorkers; i++ {
 		e.wg.Add(1)
-		go e.worker()
+		go e.worker(i)
 	}
 	e.workers += additionalWorkers
 	e.logger.Println("Scaled workers to:", e.workers)

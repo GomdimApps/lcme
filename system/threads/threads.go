@@ -4,7 +4,9 @@ import (
 	"log"
 	"runtime"
 	"sync"
+	"syscall"
 	"time"
+	"unsafe"
 
 	"golang.org/x/sys/unix"
 )
@@ -62,6 +64,10 @@ func (e *Engine) worker(index int) {
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
 
+	if err := setCPUAffinity(index % runtime.NumCPU()); err != nil {
+		e.logger.Println("Failed to set CPU affinity:", err)
+	}
+
 	cpuSet := unix.CPUSet{}
 	cpuSet.Set(index % runtime.NumCPU())
 	unix.SchedSetaffinity(0, &cpuSet)
@@ -111,6 +117,16 @@ func (e *Engine) monitorLoad() {
 			e.scaleWorkers()
 		}
 	}
+}
+
+func setCPUAffinity(cpu int) error {
+	var mask [1]uintptr
+	mask[0] = 1 << cpu
+	_, _, err := syscall.RawSyscall(syscall.SYS_SCHED_SETAFFINITY, uintptr(syscall.Getpid()), uintptr(len(mask)*8), uintptr(unsafe.Pointer(&mask[0])))
+	if err != 0 {
+		return err
+	}
+	return nil
 }
 
 // Stop gracefully shuts down the engine by closing the task channel and waiting for all workers to finish.

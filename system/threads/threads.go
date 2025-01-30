@@ -24,14 +24,13 @@ type Engine struct {
 	pool       sync.Pool      // Pool for reusable task objects
 }
 
-// NewEngine initializes a new Engine with a logger and a starting number of workers.
+// NewEngine initializes a new Engine with a logger and an optimal number of workers.
 func NewEngine(maxWorkers int) *Engine {
-	// Logger configuration using standard log
 	logger := log.New(log.Writer(), "Engine: ", log.LstdFlags)
 
-	initialWorkers := int(float64(runtime.NumCPU()) * 0.06)
-	if initialWorkers < 1 {
-		initialWorkers = 1
+	initialWorkers := runtime.NumCPU()
+	if initialWorkers > maxWorkers {
+		initialWorkers = maxWorkers
 	}
 
 	return &Engine{
@@ -62,9 +61,13 @@ func (e *Engine) worker(index int) {
 	defer e.wg.Done()
 	runtime.LockOSThread()
 	defer runtime.UnlockOSThread()
+
 	cpuSet := unix.CPUSet{}
 	cpuSet.Set(index % runtime.NumCPU())
 	unix.SchedSetaffinity(0, &cpuSet)
+
+	// Ajustando prioridade para alta performance
+	unix.Setpriority(unix.PRIO_PROCESS, 0, -20)
 
 	for task := range e.tasks {
 		task()
@@ -81,15 +84,18 @@ func (e *Engine) AddTask(task Task) {
 	}
 }
 
-// scaleWorkers increases the number of worker goroutines based on CPU count.
+// scaleWorkers dynamically increases the number of worker goroutines based on load.
 func (e *Engine) scaleWorkers() {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	if e.workers < e.maxWorkers {
 		additionalWorkers := (e.maxWorkers - e.workers) / 2
+		if additionalWorkers < 1 {
+			additionalWorkers = 1
+		}
 		for i := 0; i < additionalWorkers; i++ {
 			e.wg.Add(1)
-			go e.worker(i)
+			go e.worker(e.workers + i)
 		}
 		e.workers += additionalWorkers
 		e.logger.Println("Scaled workers to:", e.workers)

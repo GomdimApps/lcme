@@ -14,21 +14,23 @@ func Cexec(command string) (string, error) {
 	if shell == "" {
 		shell = "sh" // Default to "sh" if SHELL is not set
 	}
-
+	// Check if the shell is executable
+	if path, err := exec.LookPath(shell); err != nil {
+		return "", fmt.Errorf("shell not found: %s", shell)
+	} else {
+		shell = path
+	}
 	cmd := exec.Command(shell, "-c", command)
 
-	var out bytes.Buffer
+	var out, stderr bytes.Buffer
 	cmd.Stdout = &out
-
-	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		return out.String(), fmt.Errorf("error when executing the command: %s\nstderr: %s", err.Error(), stderr.String())
 	}
 
-	if cmd.ProcessState.ExitCode() != 0 {
+	if exitCode := cmd.ProcessState.ExitCode(); exitCode != 0 {
 		return out.String(), fmt.Errorf("stderr: %s", stderr.String())
 	}
 

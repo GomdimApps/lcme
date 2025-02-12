@@ -1,4 +1,21 @@
-## Version 1.1.6 - latest
+## Version 1.1.7 - latest
+
+#### New Features
+- **ScaleFork Function & Task Engine**:  
+  Introduced the `ScaleFork` function alongside a new Engine for task management and execution. The Engine now supports dynamic adjustment of worker threads based on available CPU cores and actively monitors running tasks.
+  
+- **File Compression Utilities**:  
+  Added functions to create ZIP and TAR.GZ archives from folders, with support for multiple files. These functions include a file size check for the TAR format to ensure robust compression capabilities.
+  
+- **Document Translation**:  
+  translation of documents into English, with the aim of improving internationalization and facilitating use by all users.
+  
+- **Import Path Updates**:  
+  Updated import paths to reflect the new directory structure for system packages, ensuring a cleaner and more maintainable codebase.
+
+---
+
+## Version 1.1.6
 
 #### New Features
 - **Network Monitoring**: Added functionality to calculate download and upload rates.

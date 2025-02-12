@@ -583,4 +583,43 @@ This function offers several benefits, especially for those looking to manage an
 - **Batch Processing:** Ideal for systems that need to process large volumes of data in batches, such as image processing systems or data analysis.
 - **Queue Systems:** Can be used as a basis for a queue system where different tasks need to be queued and executed asynchronously.
 - **Web Applications:** Can serve as a backend for web applications that require background processing, such as sending emails, push notifications, etc.
+
+---
+
+# Compressing Files
+
+This function compresses files in a simple and fast way.
+
+### Usage Examples
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/GomdimApps/lcme"
+)
+
+func main() {
+	files := []string{"file1.txt", "file2.txt"} // Add the names of the files you want to compress
+
+	zipOutput := "output.zip"                   // Name of the output ZIP file
+	tarGzOutput := "output.tar.gz"              // Name of the output TAR.GZ file
+
+	err := lcme.ZipFiles(zipOutput, files)
+	if err != nil {
+		fmt.Println("Error compressing files into ZIP:", err)
+	} else {
+		fmt.Println("Files successfully compressed into ZIP!")
+	}
+
+	err = lcme.TarGzFiles(tarGzOutput, files)
+	if err != nil {
+		fmt.Println("Error compressing files into TAR.GZ:", err)
+	} else {
+		fmt.Println("Files successfully compressed into TAR.GZ!")
+	}
+}
 ```
+

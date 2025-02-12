@@ -297,6 +297,8 @@ func main() {
 
 	fmt.Printf("Download: %d KB\n", serverInfo.Network.Download)
 	fmt.Printf("Upload: %d KB\n", serverInfo.Network.Upload)
+}
+```
 
 ### Hardware Table
 

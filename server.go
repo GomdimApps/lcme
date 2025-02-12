@@ -1,7 +1,10 @@
 package lcme
 
 import (
+	"archive/tar"
+	"archive/zip"
 	"bytes"
+	"compress/gzip"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -9,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/GomdimApps/lcme/system"
+	"github.com/GomdimApps/lcme/system/compressfiles"
 	"github.com/GomdimApps/lcme/system/threads"
 	"github.com/GomdimApps/lcme/system/utils"
 )
@@ -147,4 +151,70 @@ func ScaleFork(task threads.Task) {
 	engine.Start()
 	engine.AddTask(task)
 	engine.Stop()
+}
+
+// ZipFiles creates a ZIP file containing the specified files.
+// It checks if the filename has the correct extension (.zip),
+// creates the ZIP file, initializes the ZIP writer,
+// and adds each file to the ZIP archive.
+func ZipFiles(filename string, files []string) error {
+	// Check if the filename has the correct .zip extension
+	if !strings.HasSuffix(filename, ".zip") {
+		return fmt.Errorf("incorrect ZIP file extension: %s", filename)
+	}
+
+	// Create the ZIP file
+	newZipFile, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer newZipFile.Close()
+
+	// Initialize the ZIP writer
+	zipWriter := zip.NewWriter(newZipFile)
+	defer zipWriter.Close()
+
+	// Add each file to the ZIP archive
+	for _, file := range files {
+		if err := compressfiles.AddFileToZip(zipWriter, file); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// TarGzFiles creates a TAR.GZ file containing the specified files.
+// It checks if the filename has the correct extension (.tar.gz),
+// creates the TAR.GZ file, initializes the GZIP and TAR writers,
+// and adds each file to the TAR archive.
+func TarGzFiles(filename string, files []string) error {
+	// Check if the filename has the correct .tar.gz extension
+	if !strings.HasSuffix(filename, ".tar.gz") {
+		return fmt.Errorf("incorrect TAR.GZ file extension: %s", filename)
+	}
+
+	// Create the TAR.GZ file
+	tarFile, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer tarFile.Close()
+
+	// Initialize the GZIP writer
+	gzipWriter := gzip.NewWriter(tarFile)
+	defer gzipWriter.Close()
+
+	// Initialize the TAR writer
+	tarWriter := tar.NewWriter(gzipWriter)
+	defer tarWriter.Close()
+
+	// Add each file to the TAR archive
+	for _, file := range files {
+		if err := compressfiles.AddFileToTar(tarWriter, file); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

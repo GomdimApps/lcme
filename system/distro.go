@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/GomdimApps/lcme/utils"
+	"github.com/GomdimApps/lcme/system/utils"
 )
 
 // DistroInfo contains information about the operating system distribution.

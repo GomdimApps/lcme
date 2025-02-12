@@ -1,84 +1,98 @@
-## Versão 1.1.6 - latest
+## Version 1.1.7 - latest
 
-#### Novas Funcionalidades
-- **Monitoramento de Rede**: Adicionada funcionalidade para calcular as taxas de download e upload.
-- **Campo GetFileInfo**: Adicionado o campo `FileExtension`, `FileData` e `FileDataBuffer` à estrutura `FileInfo` e atualizado `GetFileInfo` para incluir extensões de arquivos.
-
-#### Refatorações
-- **calculateCPUUsage**: Refatorada a função `calculateCPUUsage` para fazer a média de múltiplas amostras, melhorando a precisão.
-
-#### Melhorias
-- **Documentação**: Atualizado `README.md` para incluir a estrutura detalhada de `FileInfo` e descrições de campos.
+#### New Features
+- **ScaleFork Function & Task Engine**:  
+  Introduced the `ScaleFork` function alongside a new Engine for task management and execution. The Engine now supports dynamic adjustment of worker threads based on available CPU cores and actively monitors running tasks.
+  
+- **File Compression Utilities**:  
+  Added functions to create ZIP and TAR.GZ archives from folders, with support for multiple files. These functions include a file size check for the TAR format to ensure robust compression capabilities.
+  
+- **Document Translation**:  
+  translation of documents into English, with the aim of improving internationalization and facilitating use by all users.
+  
+- **Import Path Updates**:  
+  Updated import paths to reflect the new directory structure for system packages, ensuring a cleaner and more maintainable codebase.
 
 ---
 
-## Versão 1.1.5
+## Version 1.1.6
 
-#### Novas Funcionalidades
-- **Função GetFolderSize**: Adicionada a função 
+#### New Features
+- **Network Monitoring**: Added functionality to calculate download and upload rates.
+- **GetFileInfo Field**: Added `FileExtension`, `FileData`, and `FileDataBuffer` fields to the `FileInfo` structure and updated `GetFileInfo` to include file extensions.
+
+#### Refactoring
+- **calculateCPUUsage**: Refactored the `calculateCPUUsage` function to average multiple samples, improving accuracy.
+
+#### Improvements
+- **Documentation**: Updated `README.md` to include the detailed structure of `FileInfo` and field descriptions.
+
+---
+
+## Version 1.1.5
+
+#### New Features
+- **GetFolderSize Function**: Added the 
 
 GetFolderSize
 
- para calcular o tamanho de uma pasta em kilobytes.
-- **Função GetFileInfo**: Adicionada a função 
+ function to calculate the size of a folder in kilobytes.
+- **GetFileInfo Function**: Added the 
 
 GetFileInfo
 
- para obter informações detalhadas sobre arquivos específicos em um diretório. A função agora aceita nomes de arquivos variádicos.
+ function to obtain detailed information about specific files in a directory. The function now accepts variadic file names.
 
-#### Alterado
-- **Documentação Atualizada**: Adicionada documentação para a função 
+#### Changed
+- **Updated Documentation**: Added documentation for the function 
 
 ---
 
-## Versão 1.1.4.1
+## Version 1.1.4.1
 
-### Refatoração de `configs.go`
-- Aprimorada a manipulação de configurações para gerenciar adequadamente valores vazios no arquivo de configuração.
+### `configs.go` Refactoring
+- Improved configuration handling to properly manage empty values in the configuration file.
 
-### Refatoração de `network.go`
-- Melhorado o manuseio de rede para suportar endereços IPv4 e IPv6 de forma contínua, aprimorando a captura de portas e IPs tanto IPv4 quanto IPv6, proporcionando maior suporte a outras distribuições. O uso de ferramentas nativas do Linux e Go ajuda na compatibilidade com várias distribuições.
+### `network.go` Refactoring
+- Enhanced network handling to support IPv4 and IPv6 addresses seamlessly, improving the capture of ports and IPs for both IPv4 and IPv6, providing greater support for other distributions. The use of native Linux and Go tools helps with compatibility across various distributions.
 
-### Refatoração de `cpu.go`
-- Atualizada a struct `CPUInfo` e refinado o cálculo de uso da CPU para métricas de desempenho mais precisas.
+### `cpu.go` Refactoring
+- Updated the `CPUInfo` struct and refined CPU usage calculation for more accurate performance metrics.
 
-### Atualização de Versão
-- Atualizada a versão do projeto para `1.1.4.1`.
-
+### Version Update
+- Updated the project version to `1.1.4.1`.
 
 ### Checklist
-- [x] Código refatorado para `configs.go`
-- [x] Código refatorado para `network.go`
-- [x] Código refatorado para `cpu.go`
-- [x] Versão atualizada para `1.1.4.1`
-- [x] Testes atualizados e aprovados
+- [x] Refactored code for `configs.go`
+- [x] Refactored code for `network.go`
+- [x] Refactored code for `cpu.go`
+- [x] Version updated to `1.1.4.1`
+- [x] Tests updated and passed
 
-### Notas de Lançamento
+### Release Notes
 
-#### Adicionado
-- Suporte contínuo para endereços IPv4 e IPv6 em `network.go`.
+#### Added
+- Continuous support for IPv4 and IPv6 addresses in `network.go`.
 
-#### Alterado
-- Manipulação de configurações aprimorada em `configs.go` para gerenciar valores vazios.
-- Cálculo de uso da CPU refinado em `cpu.go` para métricas de desempenho mais precisas.
+#### Changed
+- Improved configuration handling in `configs.go` to manage empty values.
+- Refined CPU usage calculation in `cpu.go` for more accurate performance metrics.
 
-#### Corrigido
-- Estabilidade e compatibilidade geral do projeto melhoradas.
+#### Fixed
+- Improved overall project stability and compatibility.
 
-#### Removido
-- Nenhuma funcionalidade removida nesta versão.
+#### Removed
+- No functionality removed in this version.
 
 ---
 
-### Versão 1.1.4
+### Version 1.1.4
 
-#### Novas Funcionalidades
-- **Captura de Distribuição Linux**: Implementada a captura detalhada de informações sobre a distribuição Linux.
-- **Documentação Atualizada**: Adicionadas referências ao framework e ao logo do projeto na documentação.
-- **Comentários no Código**: Inseridos comentários explicativos em todas as funções para facilitar o entendimento do código.
-- **Captura de Portas de Rede**: Adicionado suporte para captura de portas TCP e UDP do sistema.
+#### New Features
+- **Linux Distribution Capture**: Implemented detailed capture of information about the Linux distribution.
+- **Updated Documentation**: Added references to the framework and project logo in the documentation.
+- **Code Comments**: Inserted explanatory comments in all functions to facilitate code understanding.
+- **Network Port Capture**: Added support for capturing system TCP and UDP ports.
 
-#### Correções
-- **Correção de Lógica**: Corrigidos erros na lógica de processamento, resultando em maior estabilidade do sistema.
-
-
+#### Fixes
+- **Logic Correction**: Fixed processing logic errors, resulting in greater system stability.

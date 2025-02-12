@@ -1,34 +1,33 @@
 # LCME (Linux Content Management Engine)
 
-<img align="right" width="159px" src="./utils/framework/logo/logo.png">
+<img align="right" width="159px" src="./system/utils/framework/logo/logo.png">
 
 [![Release](https://img.shields.io/github/release/GomdimApps/lcme.svg?style=flat-square)](https://github.com/GomdimApps/lcme/releases/)
 [![Go Reference](https://pkg.go.dev/badge/github.com/GomdimApps/lcme?status.svg)](https://pkg.go.dev/github.com/GomdimApps/lcme?tab=doc)
 
+### **Purpose of the LCME Framework**
 
-### **Propósito do Framework LCME**
+LCME is a framework designed to facilitate the creation and management of content in web applications and microservices applications on Linux. It is lightweight and modular, allowing developers to integrate content management functionalities efficiently and scalably.
 
-O LCME é um framework projetado para facilitar a criação e gestão de conteúdo em aplicações web e aplicações de microserviços no Linux. Ele é leve e modular, permitindo que desenvolvedores integrem funcionalidades de gerenciamento de conteúdo de forma eficiente e escalável.
+### **Framework Objective**
 
-### **Objetivo do Framework**
+The main objective of LCME is to provide a simple and effective solution for content management, with a special focus on microservices applications developed in Go. The project aims to use the minimum of third-party frameworks, making the application highly native and reducing external dependencies.
 
-O principal objetivo do LCME é fornecer uma solução simples e eficaz para o gerenciamento de conteúdo, com um foco especial em aplicações de microserviços desenvolvidas em Go. O projeto visa utilizar o mínimo de frameworks de terceiros, tornando a aplicação altamente nativa e reduzindo dependências externas.
+### **How LCME Can Help in Go Projects**
 
-### **Como o LCME Pode Ajudar em Projetos Go**
+1. **Modularity**: The framework is modular, meaning you can choose and integrate only the components necessary for your project, keeping the system lightweight and efficient.
 
-1. **Modularidade**: O framework é modular, o que significa que você pode escolher e integrar apenas os componentes que são necessários para o seu projeto, mantendo o sistema leve e eficiente.
+2. **Scalability**: With a lightweight architecture, LCME allows applications to scale efficiently, supporting an increase in content volume without compromising performance.
 
-2. **Escalabilidade**: Com uma arquitetura leve, o LCME permite que aplicações escalem de forma eficiente, suportando um aumento no volume de conteúdo sem comprometer o desempenho.
+3. **Customization**: LCME offers a high degree of customization, allowing developers to adapt the framework to the specific needs of the project, whether in the user interface or backend logic.
 
-3. **Customização**: O LCME oferece uma alta capacidade de customização, permitindo que desenvolvedores adaptem o framework às necessidades específicas do projeto, seja na interface de usuário ou na lógica de backend.
+4. **Nativism**: By minimizing the use of third-party frameworks, LCME ensures that the application remains highly native, which can result in better performance and lower complexity.
 
-4. **Natividade**: Ao minimizar o uso de frameworks de terceiros, o LCME garante que a aplicação permaneça altamente nativa, o que pode resultar em melhor desempenho e menor complexidade.
+5. **Native Interaction with Linux**: LCME facilitates the use and implementation of microservices, bringing native ways to interact with the Linux operating system (Server) within an application, which can be extremely useful for low-level operations and system-specific optimizations.
 
-5. **Interação Nativa com Linux**: O LCME facilita o uso e a implementação de microserviços, trazendo maneiras nativas de interagir com o sistema operacional Linux (Server) dentro de uma aplicação, o que pode ser extremamente útil para operações de baixo nível e otimizações específicas do sistema.
+6. **Documentation and Support**: The repository includes detailed documentation and usage examples, making it easier to learn and implement the framework in new projects.
 
-6. **Documentação e Suporte**: O repositório inclui documentação detalhada e exemplos de uso, facilitando a curva de aprendizado e a implementação do framework em novos projetos.
-
-## Como adicionar o Framework
+## How to Add the Framework
 
 ```bash
 go get github.com/GomdimApps/lcme
@@ -36,90 +35,90 @@ go get github.com/GomdimApps/lcme
 
 # Shell
 
-Executa um comando Shell e retorna a saída padrão e um erro, se houver.
+Executes a Shell command and returns the standard output and an error, if any.
 
-#### Parâmetros
+#### Parameters
 
-- **`command`** (string): Comando Shell a ser executado.
+- **`command`** (string): Shell command to be executed.
 
-#### Retornos
+#### Returns
 
-- **`string`**: Saída padrão do comando.
-- **`error`**: Descrição do erro, se ocorrer.
+- **`string`**: Standard output of the command.
+- **`error`**: Error description, if any.
 
-#### Exemplo de Uso
+#### Usage Example
 
 ```go
 package main
 
 import (
-    "fmt"
-    "github.com/GomdimApps/lcme"
+	"fmt"
+	"github.com/GomdimApps/lcme"
 )
 
 func main() {
-    comando := "rm -r teste.txt" // Comando a ser executado
+	command := "rm -r teste.txt" // Command to be executed
 
-    resultado, erro := lcme.Shell(comando)
-    if erro != nil {
-        fmt.Println("Erro:", erro) // Exibe erro, se houver
-    } else {
-        fmt.Println("Resultado:", resultado) // Exibe a saída do comando
-    }
+	result, err := lcme.Shell(command)
+	if err != nil {
+		fmt.Println("Error:", err) // Display error, if any
+	} else {
+		fmt.Println("Result:", result) // Display command output
+	}
 }
 ```
 
-### Comportamento
+### Behavior
 
-- Retorna a saída do comando e `nil` se bem-sucedido.
-- Retorna a saída e um erro descritivo se o comando falhar.
+- Returns the command output and `nil` if successful.
+- Returns the output and a descriptive error if the command fails.
 
 ---
 
 # ConfigRead
 
-A função `ConfigRead` serve para carregar um arquivo de configuração (`config.conf`) e preencher a estrutura `Config` com os valores lidos. O arquivo de configuração deve seguir o formato `chave=valor`.
+The `ConfigRead` function is used to load a configuration file (`config.conf`) and populate the `Config` structure with the values read. The configuration file must follow the `key=value` format.
 
-### Como Usar:
+### How to Use:
 
-1. Crie um arquivo de configuração no formato adequado (ver abaixo).
-2. Chame a função `ConfigRead` passando o caminho do arquivo e a estrutura `Config`.
-3. A função preencherá os campos da estrutura com os valores do arquivo.
+1. Create a configuration file in the appropriate format (see below).
+2. Call the `ConfigRead` function, passing the file path and the `Config` structure.
+3. The function will populate the structure fields with the values from the file.
 
-### Regras para o Arquivo de Configuração
+### Configuration File Rules
 
-- Cada linha do arquivo deve ter o formato `chave=valor`.
-- O nome da chave deve ser exatamente igual ao nome do campo da estrutura `Config`, respeitando letras maiúsculas e minúsculas.
-- Os valores devem ser compatíveis com o tipo de dado correspondente ao campo:
-  - Para `bool`: Use `true` ou `false`.
-  - Para `int`, `int64`, `uint64`: Use números inteiros.
-  - Para `float32`, `float64`: Use números decimais (ponto `.` para separar a parte decimal).
-  - Para `string`: Use qualquer sequência de texto sem espaços ao redor do valor.
+- Each line of the file must be in the `key=value` format.
+- The key name must exactly match the field name in the `Config` structure, respecting case sensitivity.
+- Values must be compatible with the corresponding field type:
+  - For `bool`: Use `true` or `false`.
+  - For `int`, `int64`, `uint64`: Use integer numbers.
+  - For `float32`, `float64`: Use decimal numbers (dot `.` to separate the decimal part).
+  - For `string`: Use any text sequence without spaces around the value.
   
-- Comentários devem começar com o caractere `#` e serão ignorados.
+- Comments must start with the `#` character and will be ignored.
 
-### Exemplo da Estrutura `Config`
+### Example of the `Config` Structure
 
-Abaixo está um exemplo de uma estrutura `Config` que pode ser usada com a função `ConfigRead`:
+Below is an example of a `Config` structure that can be used with the `ConfigRead` function:
 
 ```go
 type Config struct {
-    AccessIp       bool
-    MaxConnections int
-    Port           int
-    HostName       string
-    Timeout        float64
-    EnableLogs     bool
-    ConnectionID   int64
-    BufferSize     uint64
-    ResponseTime   float32
+	AccessIp       bool
+	MaxConnections int
+	Port           int
+	HostName       string
+	Timeout        float64
+	EnableLogs     bool
+	ConnectionID   int64
+	BufferSize     uint64
+	ResponseTime   float32
 }
 ```
 
-#### Exemplo de arquivo `config.conf`:
+#### Example of `config.conf` file:
 
 ```
-# Configurações do servidor
+# Server configurations
 AccessIp=true
 MaxConnections=100
 Port=8080
@@ -131,59 +130,58 @@ BufferSize=4096
 ResponseTime=0.25
 ```
 
-- **Chave**: Deve corresponder exatamente ao nome do campo na estrutura `Config`.
-- **Valor**: Deve ser compatível com o tipo do campo (exemplo: `true` ou `false` para booleanos, números para inteiros e floats, etc.).
+- **Key**: Must exactly match the field name in the `Config` structure.
+- **Value**: Must be compatible with the field type (e.g., `true` or `false` for booleans, numbers for integers and floats, etc.).
 
-### Comando de Uso na `main`:
+### Usage Command in `main`:
 
 ```go
 package main
 
 import (
-    "fmt"
-    "log"
-    "github.com/GomdimApps/lcme" 
+	"fmt"
+	"log"
+	"github.com/GomdimApps/lcme" 
 )
 
 type Config struct {
-    AccessIp       bool
-    MaxConnections int
-    Port           int
-    HostName       string
-    Timeout        float64
-    EnableLogs     bool
-    ConnectionID   int64
-    BufferSize     uint64
-    ResponseTime   float32
+	AccessIp       bool
+	MaxConnections int
+	Port           int
+	HostName       string
+	Timeout        float64
+	EnableLogs     bool
+	ConnectionID   int64
+	BufferSize     uint64
+	ResponseTime   float32
 }
 
 func main() {
 
-    config := Config{}
+	config := Config{}
 
-    err := lcme.ConfigRead("config.conf", &config)
-    if err != nil {
-        log.Fatalf("Error loading configuration: %s", err)
-    }
+	err := lcme.ConfigRead("config.conf", &config)
+	if err != nil {
+		log.Fatalf("Error loading configuration: %s", err)
+	}
 
-    fmt.Printf("AccessIp: %t\n", config.AccessIp)
-    fmt.Printf("MaxConnections: %d\n", config.MaxConnections)
-    fmt.Printf("Port: %d\n", config.Port)
-    fmt.Printf("HostName: %s\n", config.HostName)
-    fmt.Printf("Timeout: %.2f\n", config.Timeout)
-    fmt.Printf("EnableLogs: %t\n", config.EnableLogs)
-    fmt.Printf("ConnectionID: %d\n", config.ConnectionID)
-    fmt.Printf("BufferSize: %d\n", config.BufferSize)
-    fmt.Printf("ResponseTime: %.2f\n", config.ResponseTime)
+	fmt.Printf("AccessIp: %t\n", config.AccessIp)
+	fmt.Printf("MaxConnections: %d\n", config.MaxConnections)
+	fmt.Printf("Port: %d\n", config.Port)
+	fmt.Printf("HostName: %s\n", config.HostName)
+	fmt.Printf("Timeout: %.2f\n", config.Timeout)
+	fmt.Printf("EnableLogs: %t\n", config.EnableLogs)
+	fmt.Printf("ConnectionID: %d\n", config.ConnectionID)
+	fmt.Printf("BufferSize: %d\n", config.BufferSize)
+	fmt.Printf("ResponseTime: %.2f\n", config.ResponseTime)
 }
 ```
 
 # getInfoServer
 
-A função `getInfoServer` é responsável por capturar diversas informações do sistema, como dados de distribuição Linux, memória, disco, CPU, e rede.
+The `getInfoServer` function is responsible for capturing various system information, such as Linux distribution data, memory, disk, CPU, and network.
 
-
-No seu código Go, importe o pacote `lcme` e chame a função `getInfoServer` para capturar as informações do servidor.
+In your Go code, import the `lcme` package and call the `getInfoServer` function to capture server information.
 
 ```go
 package main
@@ -194,100 +192,96 @@ import (
 )
 
 func main() {
-	// Captura informações do servidor
+	// Capture server information
 	serverInfo := lcme.GetInfoServer()
 
-	// Exibe os dados capturados
-	fmt.Printf("Distribuição Linux: %s\n", serverInfo.Distribution.Name)
-	fmt.Printf("Memória total: %d MB\n", serverInfo.RAM.Total)
-	
+	// Display captured data
+	fmt.Printf("Linux Distribution: %s\n", serverInfo.Distribution.Name)
+	fmt.Printf("Total Memory: %d MB\n", serverInfo.RAM.Total)
 }
 ```
 
----
+### Distribution Table
 
-### Tabela de Distribuição
-
-| Campo                        | Tipo    | Descrição                                                                 |
+| Field                        | Type    | Description                                                                 |
 |------------------------------|---------|---------------------------------------------------------------------------|
-| `Distribution.PrettyName`     | `string`| Nome legível e completo da distribuição, geralmente inclui o nome e versão. |
-| `Distribution.Name`           | `string`| Nome da distribuição, como "Debian GNU/Linux".                            |
-| `Distribution.VersionID`      | `string`| ID da versão da distribuição (ex: "12").                                   |
-| `Distribution.Version`        | `string`| Descrição da versão da distribuição, geralmente inclui número e nome codinome (ex: "12 (bookworm)"). |
-| `Distribution.VersionCodeName`| `string`| Codinome da versão da distribuição, usado internamente (ex: "bookworm").  |
-| `Distribution.ID`             | `string`| Identificador único da distribuição (ex: "debian").                       |
-| `Distribution.HomeURL`        | `string`| URL do site principal da distribuição (ex: "https://www.debian.org/").    |
-| `Distribution.SupportURL`     | `string`| URL para obter suporte técnico da distribuição (ex: "https://www.debian.org/support"). |
-| `Distribution.BugReportURL`   | `string`| URL para reportar bugs da distribuição (ex: "https://bugs.debian.org/").  |
+| `Distribution.PrettyName`     | `string`| Human-readable and complete name of the distribution, usually includes name and version. |
+| `Distribution.Name`           | `string`| Name of the distribution, such as "Debian GNU/Linux".                            |
+| `Distribution.VersionID`      | `string`| Version ID of the distribution (e.g., "12").                                   |
+| `Distribution.Version`        | `string`| Description of the distribution version, usually includes number and codename (e.g., "12 (bookworm)"). |
+| `Distribution.VersionCodeName`| `string`| Codename of the distribution version, used internally (e.g., "bookworm").  |
+| `Distribution.ID`             | `string`| Unique identifier of the distribution (e.g., "debian").                       |
+| `Distribution.HomeURL`        | `string`| URL of the distribution's main website (e.g., "https://www.debian.org/").    |
+| `Distribution.SupportURL`     | `string`| URL for obtaining technical support for the distribution (e.g., "https://www.debian.org/support"). |
+| `Distribution.BugReportURL`   | `string`| URL for reporting bugs in the distribution (e.g., "https://bugs.debian.org/").  |
 
 ---
 
-### Tabela de Memória RAM
+### RAM Table
 
-| Campo              | Tipo    | Descrição                         |
+| Field              | Type    | Description                         |
 |--------------------|---------|-----------------------------------|
-| `RAM.Total`        | `uint64`| Memória RAM total em megabytes (MB). |
-| `RAM.Used`         | `uint64`| Memória RAM usada em megabytes (MB). |
-| `RAM.Available`    | `uint64`| Memória RAM disponível em megabytes (MB). |
+| `RAM.Total`        | `uint64`| Total RAM in megabytes (MB). |
+| `RAM.Used`         | `uint64`| Used RAM in megabytes (MB). |
+| `RAM.Available`    | `uint64`| Available RAM in megabytes (MB). |
 
 ---
 
-### Tabela de Espaço em Disco
+### Disk Space Table
 
-| Campo             | Tipo    | Descrição                         |
+| Field             | Type    | Description                         |
 |-------------------|---------|-----------------------------------|
-| `Disk.Total`      | `uint64`| Espaço total em disco em megabytes (MB). |
-| `Disk.Used`       | `uint64`| Espaço em disco utilizado em megabytes (MB). |
-| `Disk.Available`  | `uint64`| Espaço em disco disponível em megabytes (MB). |
+| `Disk.Total`      | `uint64`| Total disk space in megabytes (MB). |
+| `Disk.Used`       | `uint64`| Used disk space in megabytes (MB). |
+| `Disk.Available`  | `uint64`| Available disk space in megabytes (MB). |
 
 ---
 
-### Tabela de CPU
+### CPU Table
 
-| Campo              | Tipo      | Descrição                        |
+| Field              | Type      | Description                        |
 |--------------------|-----------|----------------------------------|
-| `CPU.NumCores`     | `int`     | Número total de núcleos do processador. |
-| `CPU.Usage`        | `float64` | Percentual atual de uso do processador. |
+| `CPU.NumCores`     | `int`     | Total number of processor cores. |
+| `CPU.Usage`        | `float64` | Current processor usage percentage. |
 
 ---
 
-### Tabela de Rede IPv4
+### IPv4 Network Table
 
-| Campo                       | Tipo        | Descrição                                                   |
+| Field                       | Type        | Description                                                   |
 |-----------------------------|-------------|-------------------------------------------------------------|
-| `Network.IPv4`               | `[]string`  | Lista de endereços IP IPv4 associados ao servidor.          |
-| `Network.IPv4Ports.TCP.Out`  | `[]string`  | Endereços de saída (`OUT`) para conexões TCP em IPv4.       |
-| `Network.IPv4Ports.TCP.In`   | `[]string`  | Endereços de entrada (`IN`) para conexões TCP em IPv4.      |
-| `Network.IPv4Ports.TCP.All`  | `[]string`  | Conexões TCP completas em IPv4, exibe tanto os endereços de saída quanto de entrada. |
-| `Network.IPv4Ports.UDP.Out`  | `[]string`  | Endereços de saída (`OUT`) para conexões UDP em IPv4.       |
-| `Network.IPv4Ports.UDP.In`   | `[]string`  | Endereços de entrada (`IN`) para conexões UDP em IPv4.      |
-| `Network.IPv4Ports.UDP.All`  | `[]string`  | Conexões UDP completas em IPv4, exibe tanto os endereços de saída quanto de entrada. |
+| `Network.IPv4`               | `[]string`  | List of IPv4 addresses associated with the server.          |
+| `Network.IPv4Ports.TCP.Out`  | `[]string`  | Outgoing (`OUT`) addresses for TCP connections in IPv4.       |
+| `Network.IPv4Ports.TCP.In`   | `[]string`  | Incoming (`IN`) addresses for TCP connections in IPv4.      |
+| `Network.IPv4Ports.TCP.All`  | `[]string`  | Complete TCP connections in IPv4, showing both outgoing and incoming addresses. |
+| `Network.IPv4Ports.UDP.Out`  | `[]string`  | Outgoing (`OUT`) addresses for UDP connections in IPv4.       |
+| `Network.IPv4Ports.UDP.In`   | `[]string`  | Incoming (`IN`) addresses for UDP connections in IPv4.      |
+| `Network.IPv4Ports.UDP.All`  | `[]string`  | Complete UDP connections in IPv4, showing both outgoing and incoming addresses. |
 
 ---
 
-### Tabela de Rede IPv6
+### IPv6 Network Table
 
-| Campo                       | Tipo        | Descrição                                                   |
+| Field                       | Type        | Description                                                   |
 |-----------------------------|-------------|-------------------------------------------------------------|
-| `Network.IPv6`               | `[]string`  | Lista de endereços IP IPv6 associados ao servidor.          |
-| `Network.IPv6Ports.TCP.Out`  | `[]string`  | Endereços de saída (`OUT`) para conexões TCP em IPv6.       |
-| `Network.IPv6Ports.TCP.In`   | `[]string`  | Endereços de entrada (`IN`) para conexões TCP em IPv6.      |
-| `Network.IPv6Ports.TCP.All`  | `[]string`  | Conexões TCP completas em IPv6, exibe tanto os endereços de saída quanto de entrada. |
-| `Network.IPv6Ports.UDP.Out`  | `[]string`  | Endereços de saída (`OUT`) para conexões UDP em IPv6.       |
-| `Network.IPv6Ports.UDP.In`   | `[]string`  | Endereços de entrada (`IN`) para conexões UDP em IPv6.      |
-| `Network.IPv6Ports.UDP.All`  | `[]string`  | Conexões UDP completas em IPv6, exibe tanto os endereços de saída quanto de entrada. |
+| `Network.IPv6`               | `[]string`  | List of IPv6 addresses associated with the server.          |
+| `Network.IPv6Ports.TCP.Out`  | `[]string`  | Outgoing (`OUT`) addresses for TCP connections in IPv6.       |
+| `Network.IPv6Ports.TCP.In`   | `[]string`  | Incoming (`IN`) addresses for TCP connections in IPv6.      |
+| `Network.IPv6Ports.TCP.All`  | `[]string`  | Complete TCP connections in IPv6, showing both outgoing and incoming addresses. |
+| `Network.IPv6Ports.UDP.Out`  | `[]string`  | Outgoing (`OUT`) addresses for UDP connections in IPv6.       |
+| `Network.IPv6Ports.UDP.In`   | `[]string`  | Incoming (`IN`) addresses for UDP connections in IPv6.      |
+| `Network.IPv6Ports.UDP.All`  | `[]string`  | Complete UDP connections in IPv6, showing both outgoing and incoming addresses. |
 
 ---
 
-### Tabela de Rede (NetworkRate)
+### Network Rate Table
 
-| Campo                       | Tipo        | Descrição                                                   |
+| Field                       | Type        | Description                                                   |
 |-----------------------------|-------------|-------------------------------------------------------------|
-| `Network.Download`          | `int64`     |  Taxa de download em kilobytes por segundo (KBps)           |
-| `Network.Upload`            | `int64`     | Taxa de upload em kilobytes por segundo (KBps).             |
+| `Network.Download`          | `int64`     | Download rate in kilobytes per second (KBps).           |
+| `Network.Upload`            | `int64`     | Upload rate in kilobytes per second (KBps).             |
 
-
-### Exemplos de Uso (NetworkRate)
+### Usage Examples (Network Rate)
 
 ```go
 package main
@@ -303,27 +297,24 @@ func main() {
 
 	fmt.Printf("Download: %d KB\n", serverInfo.Network.Download)
 	fmt.Printf("Upload: %d KB\n", serverInfo.Network.Upload)
-
 }
 ```
 
----
+### Hardware Table
 
-### Tabela de Hardware
-
-| Campo                    | Tipo      | Descrição                           |
-|--------------------------|-----------|-------------------------------------|
-| `Hardware.KernelVersion`  | `string`  | Versão do kernel do sistema operacional. |
-| `Hardware.ProcessorName`  | `string`  | Nome do processador do servidor.   |
-| `Hardware.Uptime`         | `int`     | Tempo de execução do servidor em minutos. |
-| `Hardware.SwapTotal`      | `int`     | Memória Swap total em megabytes (MB). |
-| `Hardware.SwapFree`       | `int`     | Memória Swap disponível em megabytes (MB). |
+| Field                | Type      | Description                           |
+|----------------------|-----------|---------------------------------------|
+| `Hardware.KernelVersion`  | `string`  | Kernel version of the operating system. |
+| `Hardware.ProcessorName`  | `string`  | Name of the server processor.          |
+| `Hardware.Uptime`         | `int`     | Server uptime in minutes.              |
+| `Hardware.SwapTotal`      | `int`     | Total Swap memory in megabytes (MB).   |
+| `Hardware.SwapFree`       | `int`     | Available Swap memory in megabytes (MB).|
 
 ---
 
-### Exemplos de Uso
+### Usage Examples
 
-#### Exemplo 1: Capturar e Exibir Informações de Rede
+#### Example 1: Capture and Display Network Information
 
 ```go
 package main
@@ -336,19 +327,19 @@ import (
 func main() {
 	serverInfo := lcme.GetInfoServer()
 
-	// Exibir IPs IPv4
+	// Display IPv4 addresses
 	for _, ip := range serverInfo.Network.IPv4 {
-		fmt.Println("IP da máquina (IPv4):", ip)
+		fmt.Println("Machine IP (IPv4):", ip)
 	}
 
-	// Exibir IPs IPv6
+	// Display IPv6 addresses
 	for _, ip := range serverInfo.Network.IPv6 {
-		fmt.Println("IP da máquina (IPv6):", ip)
+		fmt.Println("Machine IP (IPv6):", ip)
 	}
 }
 ```
 
-#### Exemplo 2: Capturar Informações de Memória
+#### Example 2: Capture Memory Information
 
 ```go
 package main
@@ -361,9 +352,9 @@ import (
 func main() {
 	serverInfo := lcme.GetInfoServer()
 
-	fmt.Printf("Memória total: %d MB\n", serverInfo.RAM.Total)
-	fmt.Printf("Memória usada: %d MB\n", serverInfo.RAM.Used)
-	fmt.Printf("Memória disponível: %d MB\n", serverInfo.RAM.Available)
+	fmt.Printf("Total Memory: %d MB\n", serverInfo.RAM.Total)
+	fmt.Printf("Used Memory: %d MB\n", serverInfo.RAM.Used)
+	fmt.Printf("Available Memory: %d MB\n", serverInfo.RAM.Available)
 }
 ```
 
@@ -371,18 +362,18 @@ func main() {
 
 # GetFolderSize
 
-A função `GetFolderSize` é utilizada para calcular o tamanho de uma pasta específica em kilobytes (KB). Ela percorre recursivamente todos os arquivos e subdiretórios dentro do diretório especificado e soma o tamanho de cada arquivo.
+The `GetFolderSize` function is used to calculate the size of a specific folder in kilobytes (KB). It recursively traverses all files and subdirectories within the specified directory and sums the size of each file.
 
-### Parâmetros
+### Parameters
 
-- **`path`** (string): Caminho do diretório cuja soma dos tamanhos dos arquivos será calculada.
+- **`path`** (string): Path of the directory whose total file sizes will be calculated.
 
-### Retornos
+### Returns
 
-- **`uint64`**: Tamanho total da pasta em kilobytes (KB).
-- **`error`**: Descrição do erro, se ocorrer. Se o usuário não tiver permissão para acessar algum arquivo ou diretório, um erro de permissão será retornado.
+- **`uint64`**: Total size of the folder in kilobytes (KB).
+- **`error`**: Error description, if any. If the user does not have permission to access any file or directory, a permission error will be returned.
 
-### Exemplo de Uso
+### Usage Example
 
 ```go
 package main
@@ -402,37 +393,37 @@ func main() {
 }
 ```
 
-### Comportamento
+### Behavior
 
-- Retorna o tamanho total da pasta em kilobytes (KB) se bem-sucedido.
-- Retorna um erro descritivo se ocorrer um problema ao acessar algum arquivo ou diretório, incluindo erros de permissão.
+- Returns the total size of the folder in kilobytes (KB) if successful.
+- Returns a descriptive error if there is a problem accessing any file or directory, including permission errors.
 
 ---
 
 # GetFileInfo
 
-A função `GetFileInfo` é utilizada para obter informações detalhadas sobre arquivos específicos em um diretório fornecido. Ela pode lidar tanto com a captura de informações de um único arquivo quanto de múltiplos arquivos. 
+The `GetFileInfo` function is used to obtain detailed information about specific files in a given directory. It can handle capturing information for both a single file and multiple files.
 
-#### Parâmetros
-- **`dir`** (string): O caminho do diretório onde os arquivos estão localizados.
-- **`files`** (variadic string): Um ou mais nomes de arquivos para os quais as informações serão capturadas.
+### Parameters
+- **`dir`** (string): The path of the directory where the files are located.
+- **`files`** (variadic string): One or more file names for which information will be captured.
 
-### Tabela de FileInfo
+### FileInfo Table
 
-| Campo                | Tipo         | Descrição                                      |
-|----------------------|--------------|------------------------------------------------|
-| `FileName`           | `string`     | Nome do arquivo.                               |
-| `FileSize`           | `int64`      | Tamanho do arquivo em bytes.                   |
-| `FileLastChange`     | `time.Time`  | Data e hora da última modificação do arquivo.  |
-| `FileUserPermisson`  | `os.FileMode`| Permissões do usuário no arquivo.              |
-| `FileExtension`      | `string`     | Extensão do arquivo.                           |
-| `FileData`           | `string`     | Conteúdo do arquivo em formato de string.      |
-| `FileDataBuffer`     | `bytes.Buffer`| Buffer contendo os dados do arquivo.           |
-| `FileDir`            | `string`     | Diretório onde o arquivo está localizado.      |
+| Field                | Type         | Description                                      |
+|----------------------|--------------|--------------------------------------------------|
+| `FileName`           | `string`     | Name of the file.                                |
+| `FileSize`           | `int64`      | Size of the file in bytes.                       |
+| `FileLastChange`     | `time.Time`  | Date and time of the last modification of the file. |
+| `FileUserPermission` | `os.FileMode`| User permissions on the file.                    |
+| `FileExtension`      | `string`     | File extension.                                  |
+| `FileData`           | `string`     | Content of the file in string format.            |
+| `FileDataBuffer`     | `bytes.Buffer`| Buffer containing the file data.                 |
+| `FileDir`            | `string`     | Directory where the file is located.             |
 
-#### Exemplo de Uso
+### Usage Example
 
-##### Capturar informações de um único arquivo:
+#### Capture information for a single file:
 ```go
 package main
 
@@ -448,16 +439,16 @@ func main() {
 		return
 	}
 
-	// Como estamos capturando apenas um arquivo, pegamos o primeiro elemento da lista
+	// Since we are capturing only one file, we take the first element of the list
 	fileInfo := fileInfos[0]
 	fmt.Printf("FileName: %s\n", fileInfo.FileName)
 	fmt.Printf("FileSize: %d KB\n", fileInfo.FileSize)
 	fmt.Printf("FileLastChange: %s\n", fileInfo.FileLastChange)
-	fmt.Printf("FileUserPermisson: %s\n", fileInfo.FileUserPermisson)
+	fmt.Printf("FileUserPermission: %s\n", fileInfo.FileUserPermission)
 }
 ```
 
-##### Capturar informações de múltiplos arquivos:
+#### Capture information for multiple files:
 ```go
 package main
 
@@ -478,59 +469,60 @@ func main() {
 		fmt.Printf("FileName: %s\n", fileInfo.FileName)
 		fmt.Printf("FileSize: %d KB\n", fileInfo.FileSize)
 		fmt.Printf("FileLastChange: %s\n", fileInfo.FileLastChange)
-		fmt.Printf("FileUserPermisson: %s\n", fileInfo.FileUserPermisson)
+		fmt.Printf("FileUserPermission: %s\n", fileInfo.FileUserPermission)
 	}
 }
 ```
 
-Com essa função, você pode facilmente obter informações detalhadas sobre arquivos específicos em um diretório, seja para um único arquivo ou para múltiplos arquivos.
+With this function, you can easily obtain detailed information about specific files in a directory, whether for a single file or multiple files.
 
 ---
 
+
 # Log
 
-A função `Log` é projetada para registrar mensagens em um arquivo de log. Isso é útil para manter um registro das atividades ou eventos que ocorrem em um programa.
+The `Log` function is designed to record messages in a log file. This is useful for keeping a record of activities or events that occur in a program.
 
-### Como Usar 
+### How to Use
 
 ```go
 package main
 
 import (
-    "github.com/GomdimApps/lcme"
+	"github.com/GomdimApps/lcme"
 )
 
 func main() {
-    succerlog := lcme.Log("log.txt")
+	logger := lcme.Log("log.txt")
 
-    // Log messages
-    succerlog("First log message")
-    succerlog("Second log message")
-    succerlog("Third log message")
+	// Log messages
+	logger("First log message")
+	logger("Second log message")
+	logger("Third log message")
 }
 ```
 
-### Passos para Usar a Função `Log`:
+### Steps to Use the `Log` Function:
 
-1. **Especificar o Caminho do Arquivo de Log:**
-    ```go
-    succerlog := lcme.Log("log.txt")
-    ```
-    Aqui, `lcme.Log("log.txt")` a função que adiciona mensagens ao arquivo `log.txt`.
+1. **Specify the Log File Path:**
+	```go
+	logger := lcme.Log("log.txt")
+	```
+	Here, `lcme.Log("log.txt")` initializes the function to add messages to the `log.txt` file.
 
-2. **Registrar Mensagens no Arquivo de Log:**
-    ```go
-    succerlog("First log message")
-    succerlog("Second log message")
-    succerlog("Third log message")
-    ```
-    Cada chamada para `succerlog` adiciona uma nova linha ao arquivo `log.txt` com a mensagem fornecida.
+2. **Record Messages in the Log File:**
+	```go
+	logger("First log message")
+	logger("Second log message")
+	logger("Third log message")
+	```
+	Each call to `logger` adds a new line to the `log.txt` file with the provided message.
 
 # MonitorNetworkRates
 
-A função `MonitorNetworkRates` é utilizada para monitorar continuamente as taxas de download e upload da interface de rede ativa. Ela retorna um canal através do qual as taxas de rede são enviadas periodicamente.
+The `MonitorNetworkRates` function is used to continuously monitor the download and upload rates of the active network interface. It returns a channel through which the network rates are periodically sent.
 
-### Exemplo de Uso
+### Usage Example
 
 ```go
 package main
@@ -545,10 +537,107 @@ func main() {
 	ratesChannel := lcme.MonitorNetworkRates()
 
 	for rate := range ratesChannel {
-
 		fmt.Printf("Download: %d KB, Upload: %d KB\n", rate.Download, rate.Upload)
-
 	}
 }
 ```
+
+---
+
+# ScaleFork
+
+The `ScaleFork` function is capable of scaling the execution of a task, managing its execution.
+
+### Usage Example
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/GomdimApps/lcme"
+)
+
+func main() {
+	// Execute the task using the ScaleFork function
+	lcme.ScaleFork(func() {
+		// Simulate a long-running operation
+		fmt.Println("Task completed")
+	})
+}
+```
+
+### Benefits
+
+This function offers several benefits, especially for those looking to manage and scale the processing of asynchronous tasks. Here are some of the main benefits:
+
+1. **Scalability:**
+	- The function allows dynamically scaling the number of workers according to the task demand. This ensures the system can handle load spikes without interruptions.
+
+2. **Efficient Task Management:**
+	- Using goroutines, the function can execute multiple tasks in parallel, increasing efficiency and processing speed.
+
+### Usage Examples
+
+- **Batch Processing:** Ideal for systems that need to process large volumes of data in batches, such as image processing systems or data analysis.
+- **Queue Systems:** Can be used as a basis for a queue system where different tasks need to be queued and executed asynchronously.
+- **Web Applications:** Can serve as a backend for web applications that require background processing, such as sending emails, push notifications, etc.
+
+---
+
+# Compressing Files
+
+This function compresses files in a simple and fast way.
+
+### Usage Examples
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+
+	"github.com/GomdimApps/lcme"
+	// Ensure the threads package is imported
+)
+
+func main() {
+	// ===== Example 1: Compressing a list of files =====
+	files := []string{"file1.txt", "file2.txt"}
+	zipFileForFiles := "./test/files.zip"
+	tarGzFileForFiles := "./test/files.tar.gz"
+
+	if err := lcme.ZipFiles(zipFileForFiles, files); err != nil {
+		log.Println("Error compressing files into ZIP:", err)
+	} else {
+		fmt.Println("Files successfully compressed into ZIP!")
+	}
+
+	if err := lcme.TarGzFiles(tarGzFileForFiles, files); err != nil {
+		log.Println("Error compressing files into TAR.GZ:", err)
+	} else {
+		fmt.Println("Files successfully compressed into TAR.GZ!")
+	}
+
+	// ===== Example 2: Compressing an entire folder =====
+	folder := "./test"
+	zipFileForFolder := "./test/folder.zip"
+	tarGzFileForFolder := "./test/folder.tar.gz"
+
+	if err := lcme.ZipFolder(zipFileForFolder, folder); err != nil {
+		log.Println("Error compressing folder into ZIP:", err)
+	} else {
+		fmt.Println("Folder successfully compressed into ZIP!")
+	}
+
+	if err := lcme.TarGzFolder(tarGzFileForFolder, folder); err != nil {
+		log.Println("Error compressing folder into TAR.GZ:", err)
+	} else {
+		fmt.Println("Folder successfully compressed into TAR.GZ!")
+	}
+}
+```
+
 

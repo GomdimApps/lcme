@@ -153,68 +153,137 @@ func ScaleFork(task threads.Task) {
 	engine.Stop()
 }
 
-// ZipFiles creates a ZIP file containing the specified files.
-// It checks if the filename has the correct extension (.zip),
-// creates the ZIP file, initializes the ZIP writer,
-// and adds each file to the ZIP archive.
-func ZipFiles(filename string, files []string) error {
-	// Check if the filename has the correct .zip extension
-	if !strings.HasSuffix(filename, ".zip") {
-		return fmt.Errorf("incorrect ZIP file extension: %s", filename)
+// ZipFiles cria um arquivo ZIP contendo os arquivos especificados na slice files.
+// Os caminhos salvos no ZIP serão apenas os nomes base dos arquivos.
+func ZipFiles(zipFilename string, files []string) error {
+	if !strings.HasSuffix(zipFilename, ".zip") {
+		return fmt.Errorf("extensão incorreta para arquivo ZIP: %s", zipFilename)
 	}
 
-	// Create the ZIP file
-	newZipFile, err := os.Create(filename)
+	// Cria o diretório de saída, se necessário.
+	outputDir := filepath.Dir(zipFilename)
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		return err
+	}
+
+	newZipFile, err := os.Create(zipFilename)
 	if err != nil {
 		return err
 	}
 	defer newZipFile.Close()
 
-	// Initialize the ZIP writer
 	zipWriter := zip.NewWriter(newZipFile)
 	defer zipWriter.Close()
 
-	// Add each file to the ZIP archive
 	for _, file := range files {
-		if err := compressfiles.AddFileToZip(zipWriter, file); err != nil {
+		// Aqui não passamos baseFolder para usar somente o nome base.
+		if err := compressfiles.AddFileToZip(zipWriter, file, ""); err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
-// TarGzFiles creates a TAR.GZ file containing the specified files.
-// It checks if the filename has the correct extension (.tar.gz),
-// creates the TAR.GZ file, initializes the GZIP and TAR writers,
-// and adds each file to the TAR archive.
-func TarGzFiles(filename string, files []string) error {
-	// Check if the filename has the correct .tar.gz extension
-	if !strings.HasSuffix(filename, ".tar.gz") {
-		return fmt.Errorf("incorrect TAR.GZ file extension: %s", filename)
+// TarGzFiles cria um arquivo TAR.GZ contendo os arquivos especificados na slice files.
+// Os caminhos salvos serão apenas os nomes base dos arquivos.
+func TarGzFiles(tarGzFilename string, files []string) error {
+	if !strings.HasSuffix(tarGzFilename, ".tar.gz") {
+		return fmt.Errorf("extensão incorreta para arquivo TAR.GZ: %s", tarGzFilename)
 	}
 
-	// Create the TAR.GZ file
-	tarFile, err := os.Create(filename)
+	outputDir := filepath.Dir(tarGzFilename)
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		return err
+	}
+
+	tarFile, err := os.Create(tarGzFilename)
 	if err != nil {
 		return err
 	}
 	defer tarFile.Close()
 
-	// Initialize the GZIP writer
 	gzipWriter := gzip.NewWriter(tarFile)
 	defer gzipWriter.Close()
 
-	// Initialize the TAR writer
 	tarWriter := tar.NewWriter(gzipWriter)
 	defer tarWriter.Close()
 
-	// Add each file to the TAR archive
 	for _, file := range files {
-		if err := compressfiles.AddFileToTar(tarWriter, file); err != nil {
+		// Aqui também não passamos baseFolder para manter apenas o nome base.
+		if err := compressfiles.AddFileToTar(tarWriter, file, ""); err != nil {
 			return err
 		}
 	}
-
 	return nil
+}
+
+// ZipFolder cria um arquivo ZIP contendo todos os arquivos (recursivamente)
+// dentro da pasta especificada, preservando a estrutura de diretórios.
+func ZipFolder(zipFilename, folder string) error {
+	if !strings.HasSuffix(zipFilename, ".zip") {
+		return fmt.Errorf("extensão incorreta para arquivo ZIP: %s", zipFilename)
+	}
+
+	outputDir := filepath.Dir(zipFilename)
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		return err
+	}
+
+	zipFile, err := os.Create(zipFilename)
+	if err != nil {
+		return err
+	}
+	defer zipFile.Close()
+
+	zipWriter := zip.NewWriter(zipFile)
+	defer zipWriter.Close()
+
+	// Caminha pela pasta e adiciona cada arquivo (ignora diretórios).
+	err = filepath.Walk(folder, func(path string, info os.FileInfo, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if info.IsDir() {
+			return nil
+		}
+		// Aqui usamos folder como baseFolder para preservar o caminho relativo.
+		return compressfiles.AddFileToZip(zipWriter, path, folder)
+	})
+	return err
+}
+
+// TarGzFolder cria um arquivo TAR.GZ contendo todos os arquivos (recursivamente)
+// dentro da pasta especificada, preservando a estrutura de diretórios.
+func TarGzFolder(tarGzFilename, folder string) error {
+	if !strings.HasSuffix(tarGzFilename, ".tar.gz") {
+		return fmt.Errorf("extensão incorreta para arquivo TAR.GZ: %s", tarGzFilename)
+	}
+
+	outputDir := filepath.Dir(tarGzFilename)
+	if err := os.MkdirAll(outputDir, 0755); err != nil {
+		return err
+	}
+
+	tarGzFile, err := os.Create(tarGzFilename)
+	if err != nil {
+		return err
+	}
+	defer tarGzFile.Close()
+
+	gzipWriter := gzip.NewWriter(tarGzFile)
+	defer gzipWriter.Close()
+
+	tarWriter := tar.NewWriter(gzipWriter)
+	defer tarWriter.Close()
+
+	err = filepath.Walk(folder, func(path string, info os.FileInfo, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+		if info.IsDir() {
+			return nil
+		}
+		return compressfiles.AddFileToTar(tarWriter, path, folder)
+	})
+	return err
 }

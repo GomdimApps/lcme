@@ -8,68 +8,80 @@ import (
 	"path/filepath"
 )
 
-// addFileToZip adds a single file to the ZIP archive.
-func AddFileToZip(zipWriter *zip.Writer, filename string) error {
-	// Open the file to be added
+// AddFileToZip adiciona um único arquivo ao arquivo ZIP.
+// Se baseFolder não for vazio, é calculado o caminho relativo para preservar a estrutura.
+func AddFileToZip(zipWriter *zip.Writer, filename, baseFolder string) error {
 	fileToZip, err := os.Open(filename)
 	if err != nil {
 		return err
 	}
 	defer fileToZip.Close()
 
-	// Get file information
 	info, err := fileToZip.Stat()
 	if err != nil {
 		return err
 	}
 
-	// Create a ZIP header based on the file information
+	var relPath string
+	if baseFolder != "" {
+		relPath, err = filepath.Rel(baseFolder, filename)
+		if err != nil {
+			return err
+		}
+	} else {
+		relPath = filepath.Base(filename)
+	}
+
 	header, err := zip.FileInfoHeader(info)
 	if err != nil {
 		return err
 	}
-	header.Name = filepath.Base(filename)
+	header.Name = relPath
 	header.Method = zip.Deflate
 
-	// Create a writer for the file header
 	writer, err := zipWriter.CreateHeader(header)
 	if err != nil {
 		return err
 	}
 
-	// Copy the file data to the ZIP writer
 	_, err = io.Copy(writer, fileToZip)
 	return err
 }
 
-// addFileToTar adds a single file to the TAR archive.
-func AddFileToTar(tarWriter *tar.Writer, filename string) error {
-	// Open the file to be added
+// AddFileToTar adiciona um único arquivo ao arquivo TAR.
+// Se baseFolder não for vazio, é calculado o caminho relativo para preservar a estrutura.
+func AddFileToTar(tarWriter *tar.Writer, filename, baseFolder string) error {
 	fileToTar, err := os.Open(filename)
 	if err != nil {
 		return err
 	}
 	defer fileToTar.Close()
 
-	// Get file information
 	info, err := fileToTar.Stat()
 	if err != nil {
 		return err
 	}
 
-	// Create a TAR header based on the file information
+	var relPath string
+	if baseFolder != "" {
+		relPath, err = filepath.Rel(baseFolder, filename)
+		if err != nil {
+			return err
+		}
+	} else {
+		relPath = filepath.Base(filename)
+	}
+
 	header, err := tar.FileInfoHeader(info, "")
 	if err != nil {
 		return err
 	}
-	header.Name = filepath.Base(filename)
+	header.Name = relPath
 
-	// Write the header to the TAR writer
 	if err := tarWriter.WriteHeader(header); err != nil {
 		return err
 	}
 
-	// Copy the file data to the TAR writer
 	_, err = io.Copy(tarWriter, fileToTar)
 	return err
 }

@@ -283,6 +283,12 @@ func TarGzFolder(tarGzFilename, folder string) error {
 		if info.IsDir() {
 			return nil
 		}
+
+		// Check the file size before adding it to the TAR
+		if info.Size() > (1<<33)-1 { // 8GB - 1 byte
+			return fmt.Errorf("arquivo muito grande para o formato TAR: %s", path)
+		}
+
 		return compressfiles.AddFileToTar(tarWriter, path, folder)
 	})
 	return err

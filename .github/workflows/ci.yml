@@ -3,6 +3,8 @@ name: Go CI
 on:
   push:
     branches: [ main ]
+    tags:
+      - 'v*.*.*'
   pull_request:
     branches: [ main ]
 
@@ -28,26 +30,25 @@ jobs:
     - name: Run tests
       run: go test -v ./...
 
-jobs:
   release:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: 1.21.0
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: 1.21.0
 
-      - name: Install dependencies
-        run: go mod tidy
+    - name: Install dependencies
+      run: go mod tidy
 
-      - name: Build
-        run: go build -ldflags "-X github.com/GomdimApps/lcme.Version=$(git describe --tags)" -v ./...
+    - name: Build
+      run: go build -ldflags "-X github.com/GomdimApps/lcme.Version=$(git describe --tags)" -v ./...
 
-      - name: Publish to pkg.go.dev
-        run: |
-          git config --global url."https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
-          git push origin --tags
+    - name: Publish to pkg.go.dev
+      run: |
+        git config --global url."https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+        git push origin --tags

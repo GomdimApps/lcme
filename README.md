@@ -597,29 +597,48 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/GomdimApps/lcme"
+	// Ensure the threads package is imported
 )
 
 func main() {
-	files := []string{"file1.txt", "file2.txt"} // Add the names of the files you want to compress
+	// ===== Example 1: Compressing a list of files =====
+	files := []string{"file1.txt", "file2.txt"}
+	zipFileForFiles := "./test/files.zip"
+	tarGzFileForFiles := "./test/files.tar.gz"
 
-	zipOutput := "output.zip"                   // Name of the output ZIP file
-	tarGzOutput := "output.tar.gz"              // Name of the output TAR.GZ file
-
-	err := lcme.ZipFiles(zipOutput, files)
-	if err != nil {
-		fmt.Println("Error compressing files into ZIP:", err)
+	if err := lcme.ZipFiles(zipFileForFiles, files); err != nil {
+		log.Println("Error compressing files into ZIP:", err)
 	} else {
 		fmt.Println("Files successfully compressed into ZIP!")
 	}
 
-	err = lcme.TarGzFiles(tarGzOutput, files)
-	if err != nil {
-		fmt.Println("Error compressing files into TAR.GZ:", err)
+	if err := lcme.TarGzFiles(tarGzFileForFiles, files); err != nil {
+		log.Println("Error compressing files into TAR.GZ:", err)
 	} else {
 		fmt.Println("Files successfully compressed into TAR.GZ!")
 	}
+
+	// ===== Example 2: Compressing an entire folder =====
+	folder := "./test"
+	zipFileForFolder := "./test/folder.zip"
+	tarGzFileForFolder := "./test/folder.tar.gz"
+
+	if err := lcme.ZipFolder(zipFileForFolder, folder); err != nil {
+		log.Println("Error compressing folder into ZIP:", err)
+	} else {
+		fmt.Println("Folder successfully compressed into ZIP!")
+	}
+
+	if err := lcme.TarGzFolder(tarGzFileForFolder, folder); err != nil {
+		log.Println("Error compressing folder into TAR.GZ:", err)
+	} else {
+		fmt.Println("Folder successfully compressed into TAR.GZ!")
+	}
 }
+```
+
 ```
 

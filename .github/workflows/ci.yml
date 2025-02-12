@@ -50,5 +50,5 @@ jobs:
 
     - name: Publish to pkg.go.dev
       run: |
-        git config --global url."https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+        git config --global url."https://${{ secrets.GHTOKEN }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
         git push origin --tags
